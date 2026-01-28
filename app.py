@@ -19,7 +19,12 @@ def load_model():
     model = models.efficientnet_b3(weights=None)
     model.classifier[1] = nn.Linear(model.classifier[1].in_features, 5)
 
-    state_dict = torch.load(model_path, map_location="cpu")
+    state_dict = torch.load(
+    model_path,
+    map_location="cpu",
+    weights_only=True
+)
+
     model.load_state_dict(state_dict)
     model.eval()
     return model
