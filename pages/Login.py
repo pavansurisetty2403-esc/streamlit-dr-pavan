@@ -30,7 +30,7 @@ section.main > div:first-child {
 .login-wrapper {
     max-width: 720px;
     margin: 10vh auto;
-    padding: 40px 56px 48px 56px;
+    padding: 60px 56px 48px 56px; /* Increased top padding to 60px for better centering */
     border-radius: 28px;
     background: linear-gradient(
         145deg,
@@ -59,7 +59,7 @@ section.main > div:first-child {
     text-align: center;
     color: #a8b3cf;
     font-size: 14px;
-    margin-bottom: 22px;
+    margin-bottom: 32px; /* Increased margin to separate from tabs */
 }
 
 /* Tabs */
@@ -111,8 +111,11 @@ input {
 """, unsafe_allow_html=True)
 
 # ---------------- UI ----------------
+
+# Opening the wrapper div
 st.markdown('<div class="login-wrapper">', unsafe_allow_html=True)
 
+# Title and Subtitle are now explicitly placed inside the wrapper
 st.markdown('<div class="login-title">Diabetic Retinopathy PS</div>', unsafe_allow_html=True)
 st.markdown(
     '<div class="login-subtitle">AI-powered retinal screening for early diabetic eye disease detection</div>',
@@ -151,4 +154,5 @@ with tab_signup:
         elif isinstance(res, AuthApiError):
             st.error("Signup failed")
 
+# Closing the wrapper div
 st.markdown('</div>', unsafe_allow_html=True)
