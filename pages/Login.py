@@ -11,14 +11,22 @@ st.set_page_config(
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 
-# ---------------- THEME + LAYOUT ----------------
+# ---------------- CSS ----------------
 st.markdown("""
 <style>
 html, body {
     background: radial-gradient(1200px at 10% 10%, #1a2235, #0b0f1a);
 }
 
-/* Center wrapper */
+/* Kill Streamlit default container */
+section.main > div:first-child {
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+}
+
+/* Login card */
 .login-wrapper {
     max-width: 720px;
     margin: 10vh auto;
@@ -72,7 +80,6 @@ button[data-baseweb="tab"] {
     font-size: 15px;
     font-weight: 600;
     color: #cfd6ee;
-    text-align: center;
 }
 
 button[aria-selected="true"] {
@@ -90,7 +97,7 @@ input {
     color: #e6ebff !important;
 }
 
-/* Primary button */
+/* Buttons */
 .stButton > button {
     background: linear-gradient(90deg,#3b82f6,#60a5fa);
     color: white;
@@ -100,43 +107,15 @@ input {
     border: none;
     margin-top: 18px;
 }
-
-.stButton > button:hover {
-    filter: brightness(1.05);
-}
-
-/* Footer */
-.login-footer {
-    text-align: center;
-    color: #7f8bb3;
-    font-size: 12px;
-    margin-top: 28px;
-}
 </style>
 """, unsafe_allow_html=True)
 
-/* REMOVE STREAMLIT GHOST TOP CONTAINER */
-section.main > div:first-child {
-    background: transparent !important;
-    box-shadow: none !important;
-    border: none !important;
-    padding: 0 !important;
-}
-
-/* REMOVE EMPTY SPACER */
-section.main > div:first-child:empty {
-    display: none !important;
-}
-
-
-# ---------------- UI START ----------------
+# ---------------- UI ----------------
 st.markdown('<div class="login-wrapper">', unsafe_allow_html=True)
 
 st.markdown('<div class="login-title">Diabetic Retinopathy PS</div>', unsafe_allow_html=True)
 st.markdown(
-    '<div class="login-subtitle">'
-    'AI-powered retinal screening for early diabetic eye disease detection'
-    '</div>',
+    '<div class="login-subtitle">AI-powered retinal screening for early diabetic eye disease detection</div>',
     unsafe_allow_html=True
 )
 
@@ -144,11 +123,11 @@ tab_login, tab_signup = st.tabs(["Login", "Create Account"])
 
 # ---------------- LOGIN ----------------
 with tab_login:
-    email = st.text_input("Email", key="login_email")
-    password = st.text_input("Password", type="password", key="login_password")
+    email = st.text_input("Email")
+    password = st.text_input("Password", type="password")
 
-    if st.button("Login", key="login_btn", use_container_width=True):
-        with st.spinner("Authenticating…"):
+    if st.button("Login", use_container_width=True):
+        with st.spinner("Authenticating"):
             res = login(email, password)
 
         if hasattr(res, "user") and res.user:
@@ -156,38 +135,20 @@ with tab_login:
             st.session_state.user_email = email
             st.rerun()
         elif isinstance(res, AuthApiError):
-            msg = str(res)
-            if "Email not confirmed" in msg:
-                st.warning("Please verify your email before logging in.")
-            elif "Invalid login credentials" in msg:
-                st.error("Incorrect email or password.")
-            else:
-                st.error("Login failed.")
+            st.error("Invalid login credentials")
 
 # ---------------- SIGNUP ----------------
 with tab_signup:
     new_email = st.text_input("Email", key="signup_email")
-    new_password = st.text_input(
-        "Password (min 6 chars)",
-        type="password",
-        key="signup_password"
-    )
+    new_password = st.text_input("Password (min 6 chars)", type="password")
 
-    if st.button("Create Account", key="signup_btn", use_container_width=True):
-        with st.spinner("Creating account…"):
+    if st.button("Create Account", use_container_width=True):
+        with st.spinner("Creating account"):
             res = signup(new_email, new_password)
 
         if hasattr(res, "user") and res.user:
-            st.success("Account created.")
-            st.info("Check your email to confirm before logging in.")
+            st.success("Account created. Verify email before login.")
         elif isinstance(res, AuthApiError):
-            st.error(str(res))
-        else:
-            st.error("Signup failed.")
-
-st.markdown(
-    '<div class="login-footer">Secure · Medical-grade · AI-assisted</div>',
-    unsafe_allow_html=True
-)
+            st.error("Signup failed")
 
 st.markdown('</div>', unsafe_allow_html=True)
