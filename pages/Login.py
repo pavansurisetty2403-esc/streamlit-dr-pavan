@@ -22,7 +22,7 @@ html, body {
 .login-wrapper {
     max-width: 720px;
     margin: 10vh auto;
-    padding: 48px 56px;
+    padding: 40px 56px 48px 56px;
     border-radius: 28px;
     background: linear-gradient(
         145deg,
@@ -38,35 +38,41 @@ html, body {
 /* Title */
 .login-title {
     text-align: center;
-    font-size: 42px;
+    font-size: 38px;
     font-weight: 700;
     background: linear-gradient(90deg,#6ea8ff,#8bdcff);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
 }
 
 /* Subtitle */
 .login-subtitle {
     text-align: center;
     color: #a8b3cf;
-    font-size: 15px;
-    margin-bottom: 36px;
+    font-size: 14px;
+    margin-bottom: 22px;
 }
 
 /* Tabs */
 div[data-baseweb="tab-list"] {
-    justify-content: space-between;
+    justify-content: center;
+    gap: 12px;
     background: rgba(255,255,255,0.04);
     border-radius: 14px;
     padding: 6px;
-    margin-bottom: 28px;
+    margin-bottom: 24px;
+    max-width: 360px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 button[data-baseweb="tab"] {
+    min-width: 160px;
     font-size: 15px;
     font-weight: 600;
     color: #cfd6ee;
+    text-align: center;
 }
 
 button[aria-selected="true"] {
@@ -135,7 +141,6 @@ with tab_login:
             st.session_state.authenticated = True
             st.session_state.user_email = email
             st.rerun()
-
         elif isinstance(res, AuthApiError):
             msg = str(res)
             if "Email not confirmed" in msg:
@@ -167,7 +172,7 @@ with tab_signup:
             st.error("Signup failed.")
 
 st.markdown(
-    '<div class="login-footer">🔒 Secure · Medical-grade · AI-assisted</div>',
+    '<div class="login-footer">Secure · Medical-grade · AI-assisted</div>',
     unsafe_allow_html=True
 )
 
