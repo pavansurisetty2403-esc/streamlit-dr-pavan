@@ -1,15 +1,43 @@
 import streamlit as st
-import time
-import os
-import requests
-from report_utils import run_pipeline
 
-# ================= PAGE CONFIG =================
 st.set_page_config(
     page_title="Diabetic Retinopathy PS",
     page_icon="🩺",
     layout="wide",
 )
+
+# ---------- AUTH GATE ----------
+if "authenticated" not in st.session_state:
+    st.session_state.authenticated = False
+
+if not st.session_state.authenticated:
+    st.switch_page("pages/Login.py")
+
+# ---------- HIDE PAGE NAV ----------
+st.markdown("""
+<style>
+[data-testid="stSidebarNav"] { display: none; }
+</style>
+""", unsafe_allow_html=True)
+
+# ---------- IMPORT AFTER AUTH ----------
+from report_utils import run_pipeline
+from auth import logout
+import time
+import os
+import requests
+
+# ---------- SIDEBAR ----------
+with st.sidebar:
+    st.markdown("### Account")
+    st.write(st.session_state.get("user_email", ""))
+    if st.button("Logout"):
+        logout()
+        st.session_state.authenticated = False
+        st.rerun()
+
+
+
 
 # ================= MODEL =================
 MODEL_URL = "https://huggingface.co/Pavansetty/DR-Pavan/resolve/main/efficientnet_b3_state_dict.pt"
