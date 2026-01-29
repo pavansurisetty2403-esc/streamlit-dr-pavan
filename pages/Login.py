@@ -131,10 +131,8 @@ div[data-testid="stVerticalBlock"] > div:has(:not(*)) {
 }
 
 # ---------------- UI START ----------------
-st.markdown(
-    '<div class="login-wrapper" style="position: relative; z-index: 10;">',
-    unsafe_allow_html=True
-)
+st.markdown('<div class="login-wrapper">', unsafe_allow_html=True)
+
 
 
 st.markdown('<div class="login-title">Diabetic Retinopathy PS</div>', unsafe_allow_html=True)
