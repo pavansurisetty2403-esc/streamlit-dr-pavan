@@ -19,28 +19,30 @@ MODEL_PATH = "efficientnet_b3_state_dict.pt"
 def ensure_model():
     if not os.path.exists(MODEL_PATH):
         with st.spinner("Downloading AI model (one-time)…"):
-            r = requests.get(MODEL_URL)
+            r = requests.get(MODEL_URL, timeout=30)
             r.raise_for_status()
             with open(MODEL_PATH, "wb") as f:
                 f.write(r.content)
     return MODEL_PATH
 
-# ================= STYLES =================
+# ================= STYLES (MERGED & CLEAN) =================
 st.markdown("""
 <style>
+/* ---------- Base / page ---------- */
 html, body {
     background: radial-gradient(1200px at 10% 10%, #1a1f2b, #0b0d12);
     color: #e6e9ef;
     font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
 }
 
+/* ---------- Animations ---------- */
 @keyframes fadeUp {
     from { opacity: 0; transform: translateY(18px) scale(0.98); }
     to { opacity: 1; transform: translateY(0) scale(1); }
 }
-
 .fade { animation: fadeUp 0.7s cubic-bezier(.2,.8,.2,1) forwards; }
 
+/* ---------- Hero ---------- */
 .hero {
     padding: 52px 44px;
     border-radius: 28px;
@@ -51,6 +53,7 @@ html, body {
     margin-bottom: 36px;
 }
 
+/* ---------- Card / glass ---------- */
 .card {
     background: rgba(255,255,255,0.04);
     backdrop-filter: blur(16px);
@@ -60,7 +63,8 @@ html, body {
     margin-bottom: 30px;
     box-shadow: 0 30px 60px rgba(0,0,0,0.45);
 }
-/* Apple-style hover glow */
+
+/* ---------- Apple-style hover glow for cards ---------- */
 .card,
 .info-card {
     transition:
@@ -68,7 +72,6 @@ html, body {
         box-shadow 0.45s cubic-bezier(.2,.8,.2,1),
         border-color 0.45s ease;
 }
-
 .card:hover,
 .info-card:hover {
     transform: translateY(-6px);
@@ -79,87 +82,12 @@ html, body {
     border-color: rgba(124,245,211,0.25);
 }
 
+/* ---------- Accent gradient text ---------- */
 .accent {
     background: linear-gradient(90deg, #5b8cff, #7cf5d3);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
-
-.center { display: flex; justify-content: center; }
-
-.status {
-    font-size: 38px;
-    font-weight: 700;
-    margin-top: 8px;
-}
-
-.conf { color: #9aa4b2; margin-top: 6px; }
-
-/* confidence bar */
-.conf-bar {
-    height: 8px;
-    border-radius: 6px;
-    background: rgba(255,255,255,0.08);
-    overflow: hidden;
-    margin-top: 12px;
-}
-.conf-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #5b8cff, #7cf5d3);
-    width: 0%;
-    animation: fillBar 1.2s ease forwards;
-}
-@keyframes fillBar {
-    to { width: var(--w); }
-}
-
-/* badge pulse */
-.badge {
-    display: inline-block;
-    padding: 6px 14px;
-    border-radius: 999px;
-    background: rgba(124,245,211,0.15);
-    color: #7cf5d3;
-    animation: pulse 2s infinite;
-}
-@keyframes pulse {
-    0% { box-shadow: 0 0 0 0 rgba(124,245,211,0.4); }
-    70% { box-shadow: 0 0 0 12px rgba(124,245,211,0); }
-    100% { box-shadow: 0 0 0 0 rgba(124,245,211,0); }
-}
-
-/* timeline */
-.timeline {
-    border-left: 2px solid rgba(255,255,255,0.1);
-    padding-left: 20px;
-}
-.timeline-item {
-    margin-bottom: 18px;
-    position: relative;
-}
-.timeline-item::before {
-    content: "";
-    position: absolute;
-    left: -11px;
-    top: 6px;
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #5b8cff, #7cf5d3);
-}
-
-.success {
-    background: linear-gradient(135deg, rgba(90,255,170,0.18), rgba(60,200,150,0.06));
-    border-radius: 18px;
-    padding: 16px;
-    color: #7cf5d3;
-}
-
-footer { visibility: hidden; }
-</style>
-""", unsafe_allow_html=True)
-st.markdown("""
-<style>
 .section-title {
     font-size: 40px;
     font-weight: 700;
@@ -168,7 +96,6 @@ st.markdown("""
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
-
 .sub-title {
     font-size: 22px;
     font-weight: 600;
@@ -177,88 +104,68 @@ st.markdown("""
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
-</style>
-""", unsafe_allow_html=True)
 
-/* Section snap + reveal + hover lift (FINAL) */
+/* ---------- layout helpers ---------- */
+.center { display: flex; justify-content: center; }
+.status { font-size: 38px; font-weight: 700; margin-top: 8px; }
+.conf { color: #9aa4b2; margin-top: 6px; }
+
+/* ---------- confidence bar ---------- */
+.conf-bar { height: 8px; border-radius: 6px; background: rgba(255,255,255,0.08); overflow: hidden; margin-top: 12px; }
+.conf-fill { height: 100%; background: linear-gradient(90deg, #5b8cff, #7cf5d3); width: 0%; animation: fillBar 1.2s ease forwards; }
+@keyframes fillBar { to { width: var(--w); } }
+
+/* ---------- badge pulse ---------- */
+.badge { display: inline-block; padding: 6px 14px; border-radius: 999px; background: rgba(124,245,211,0.15); color: #7cf5d3; animation: pulse 2s infinite; }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(124,245,211,0.4); } 70% { box-shadow: 0 0 0 12px rgba(124,245,211,0); } 100% { box-shadow: 0 0 0 0 rgba(124,245,211,0); } }
+
+/* ---------- timeline ---------- */
+.timeline { border-left: 2px solid rgba(255,255,255,0.1); padding-left: 20px; }
+.timeline-item { margin-bottom: 18px; position: relative; }
+.timeline-item::before { content: ""; position: absolute; left: -11px; top: 6px; width: 12px; height: 12px; border-radius: 50%; background: linear-gradient(135deg, #5b8cff, #7cf5d3); }
+
+/* ---------- success ---------- */
+.success { background: linear-gradient(135deg, rgba(90,255,170,0.18), rgba(60,200,150,0.06)); border-radius: 18px; padding: 16px; color: #7cf5d3; }
+
+/* ---------- snap-section: reveal + hover lift (FINAL) ---------- */
 .snap-section {
     scroll-margin-top: 80px;
     border-radius: 32px;
-
-    /* entry animation */
     opacity: 0;
     transform: translateY(60px) scale(0.96);
     animation: snapIn 0.9s cubic-bezier(.2,.8,.2,1) both;
-
-    /* hover behavior */
-    transition:
-        transform 0.6s cubic-bezier(.2,.8,.2,1),
-        box-shadow 0.6s cubic-bezier(.2,.8,.2,1);
+    transition: transform 0.6s cubic-bezier(.2,.8,.2,1), box-shadow 0.6s cubic-bezier(.2,.8,.2,1);
 }
-
 .snap-section:hover {
     transform: translateY(-4px) scale(1);
-    box-shadow:
-        0 0 0 1px rgba(124,245,211,0.12),
-        0 60px 140px rgba(0,0,0,0.6);
+    box-shadow: 0 0 0 1px rgba(124,245,211,0.12), 0 60px 140px rgba(0,0,0,0.6);
 }
+@keyframes snapIn { to { opacity: 1; transform: translateY(0) scale(1); } }
 
-@keyframes snapIn {
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-}
-
-
-
-
-# ================= ABOUT SECTION STYLES =================
-st.markdown("""
-<style>
+/* ---------- about-section styles ---------- */
 .about-section {
     padding: 64px 56px;
     border-radius: 32px;
-    background: linear-gradient(
-        180deg,
-        rgba(255,255,255,0.05),
-        rgba(255,255,255,0.015)
-    );
+    background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.015));
     box-shadow: 0 50px 120px rgba(0,0,0,0.6);
     margin: 80px auto;
     max-width: 1100px;
 }
-
-.fade-up {
-    opacity: 0;
-    transform: translateY(24px);
-    animation: fadeUp 0.8s ease forwards;
-}
-
+.fade-up { opacity: 0; transform: translateY(24px); animation: fadeUp 0.8s ease forwards; }
 .fade-up.delay-1 { animation-delay: 0.2s; }
 .fade-up.delay-2 { animation-delay: 0.4s; }
 .fade-up.delay-3 { animation-delay: 0.6s; }
+@keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
 
-@keyframes fadeUp {
-    to { opacity: 1; transform: translateY(0); }
-}
+.info-card { margin-top: 28px; padding: 26px 28px; border-radius: 22px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); }
+.info-title { color: #7cf5d3; font-weight: 600; margin-bottom: 8px; }
 
-.info-card {
-    margin-top: 28px;
-    padding: 26px 28px;
-    border-radius: 22px;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.08);
-}
-
-.info-title {
-    color: #7cf5d3;
-    font-weight: 600;
-    margin-bottom: 8px;
-}
+footer { visibility: hidden; }
 </style>
 """, unsafe_allow_html=True)
 
+# force style refresh hint for Streamlit
+st.markdown("<!-- force-style-refresh -->", unsafe_allow_html=True)
 
 # ================= HERO =================
 st.markdown("""
@@ -317,22 +224,21 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-
 # ================= HOW IT WORKS =================
 st.markdown("""
-<div class="card fade">
-<h2 class="section-title fade-up">How It Works</h2>
-<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:18px">
-<div><b>1. Upload</b><br><span class="conf">Secure fundus image upload</span></div>
-<div><b>2. Analyze</b><br><span class="conf">Deep learning retinal assessment</span></div>
-<div><b>3. Report</b><br><span class="conf">Stage prediction & PDF</span></div>
-</div>
+<div class="card fade snap-section">
+  <h2 class="section-title fade-up">How It Works</h2>
+  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:18px">
+    <div class="info-card"><b>1. Upload</b><br><span class="conf">Secure fundus image upload</span></div>
+    <div class="info-card"><b>2. Analyze</b><br><span class="conf">Deep learning retinal assessment</span></div>
+    <div class="info-card"><b>3. Report</b><br><span class="conf">Stage prediction & PDF</span></div>
+  </div>
 </div>
 """, unsafe_allow_html=True)
 
 # ================= UPLOAD =================
 st.markdown("""
-<div class="card fade center">
+<div class="card fade center snap-section">
   <h2 class="section-title fade-up center">Upload Fundus Image</h2>
 </div>
 """, unsafe_allow_html=True)
@@ -357,7 +263,7 @@ if uploaded:
 
     # ================= RESULT =================
     st.markdown(f"""
-    <div class="card fade">
+    <div class="card fade snap-section">
       <h3 class="accent">Retinal Status</h3>
       <span class="badge">{cls}</span>
       <div class="status">{cls}</div>
@@ -369,15 +275,15 @@ if uploaded:
 
     # ================= STAGES =================
     st.markdown("""
-    <div class="card fade">
-    <h2>Stages of Diabetic Retinopathy</h2>
-    <div class="timeline">
-      <div class="timeline-item">No DR – Healthy retina</div>
-      <div class="timeline-item">Mild – Microaneurysms</div>
-      <div class="timeline-item">Moderate – Leakage & blockage</div>
-      <div class="timeline-item">Severe – Ischemia</div>
-      <div class="timeline-item">Proliferative – Abnormal vessels</div>
-    </div>
+    <div class="card fade snap-section">
+      <h2 class="section-title">Stages of Diabetic Retinopathy</h2>
+      <div class="timeline">
+        <div class="timeline-item">No DR – Healthy retina</div>
+        <div class="timeline-item">Mild – Microaneurysms</div>
+        <div class="timeline-item">Moderate – Leakage & blockage</div>
+        <div class="timeline-item">Severe – Ischemia</div>
+        <div class="timeline-item">Proliferative – Abnormal vessels</div>
+      </div>
     </div>
     """, unsafe_allow_html=True)
 
