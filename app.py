@@ -11,7 +11,7 @@ def load_model():
     model_path = "efficientnet_b3_best.pt"
 
     if not os.path.exists(model_path):
-        url = "https://huggingface.co/pavansurisetty/aptos-dr-model/resolve/main/efficientnet_b3_best.pt"
+        url = "https://huggingface.co/Pavansetty/DR-Pavan/resolve/main/efficientnet_b3_state_dict.pt"
         r = requests.get(url)
         with open(model_path, "wb") as f:
             f.write(r.content)
