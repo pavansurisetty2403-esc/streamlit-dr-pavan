@@ -154,13 +154,98 @@ st.markdown("""
 
 # ================= ABOUT =================
 st.markdown("""
-<div class="card fade">
-<h2>About Diabetic Retinopathy</h2>
-<p>
-Diabetic Retinopathy is a diabetes-related eye disease caused by damage to retinal
-blood vessels. It often progresses silently and may cause permanent vision loss
-if untreated.
-</p>
+<style>
+.scroll-section {
+    position: relative;
+    padding: 60px 48px;
+    border-radius: 28px;
+    background: linear-gradient(
+        180deg,
+        rgba(255,255,255,0.06),
+        rgba(255,255,255,0.02)
+    );
+    box-shadow: 0 40px 90px rgba(0,0,0,0.65);
+    margin-bottom: 80px;
+}
+
+.reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    animation: revealUp 0.9s ease forwards;
+}
+
+.reveal.delay-1 { animation-delay: 0.2s; }
+.reveal.delay-2 { animation-delay: 0.4s; }
+.reveal.delay-3 { animation-delay: 0.6s; }
+
+@keyframes revealUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 28px;
+    margin-top: 36px;
+}
+
+.info-box {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    padding: 24px;
+}
+
+.info-title {
+    color: #7cf5d3;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+</style>
+
+<div class="scroll-section">
+  <h2 class="reveal">About Diabetic Retinopathy</h2>
+
+  <p class="reveal delay-1" style="max-width:900px; font-size:16px; color:#cfd5e2;">
+    Diabetic Retinopathy (DR) is a progressive eye disease caused by long-term diabetes.
+    Persistently high blood sugar damages the tiny blood vessels of the retina —
+    the light-sensitive tissue responsible for vision.
+  </p>
+
+  <p class="reveal delay-2" style="max-width:900px; font-size:16px; color:#cfd5e2;">
+    In early stages, DR often shows no symptoms. As the disease progresses,
+    vessels may leak fluid, become blocked, or grow abnormally, leading to blurred vision,
+    dark spots, or irreversible blindness if untreated.
+  </p>
+
+  <div class="info-grid">
+    <div class="info-box reveal delay-1">
+      <div class="info-title">Why it’s dangerous</div>
+      <p style="color:#b8bfcc;">
+        Vision loss from DR is often permanent. By the time symptoms appear,
+        significant retinal damage may already have occurred.
+      </p>
+    </div>
+
+    <div class="info-box reveal delay-2">
+      <div class="info-title">Who is at risk</div>
+      <p style="color:#b8bfcc;">
+        Anyone with diabetes — especially longer than 5–10 years —
+        poor glucose control, high blood pressure, or kidney disease.
+      </p>
+    </div>
+
+    <div class="info-box reveal delay-3">
+      <div class="info-title">Why early screening matters</div>
+      <p style="color:#b8bfcc;">
+        Early detection enables treatment before vision loss begins.
+        Routine screening can reduce blindness risk by more than 90%.
+      </p>
+    </div>
+  </div>
 </div>
 """, unsafe_allow_html=True)
 
