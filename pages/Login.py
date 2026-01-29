@@ -114,26 +114,23 @@ input {
 }
 </style>
 """, unsafe_allow_html=True)
-/* REMOVE GHOST TOP CARD */
+
+/* REMOVE STREAMLIT GHOST TOP CONTAINER */
 section.main > div:first-child {
-    background: none !important;
+    background: transparent !important;
     box-shadow: none !important;
     border: none !important;
+    padding: 0 !important;
 }
 
+/* REMOVE EMPTY SPACER */
 section.main > div:first-child:empty {
     display: none !important;
 }
 
-/* Also nuke any stray rounded containers */
-div[data-testid="stVerticalBlock"] > div:has(:not(*)) {
-    display: none !important;
-}
 
 # ---------------- UI START ----------------
 st.markdown('<div class="login-wrapper">', unsafe_allow_html=True)
-
-
 
 st.markdown('<div class="login-title">Diabetic Retinopathy PS</div>', unsafe_allow_html=True)
 st.markdown(
