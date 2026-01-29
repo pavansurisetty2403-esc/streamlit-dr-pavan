@@ -1,165 +1,208 @@
 import streamlit as st
-from auth import signup, login
+from auth import login, signup
 from supabase_auth.errors import AuthApiError
+import time
 
-# ================= PAGE CONFIG =================
+# ---------------- PAGE CONFIG ----------------
 st.set_page_config(
     page_title="Diabetic Retinopathy PS | Login",
-    layout="centered",
+    layout="wide",
 )
 
-# ================= SESSION =================
+# ---------------- SESSION INIT ----------------
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 
 if "auth_mode" not in st.session_state:
     st.session_state.auth_mode = "login"
 
-# ================= STYLES =================
+# ---------------- GLOBAL CSS ----------------
 st.markdown("""
 <style>
-html, body, [data-testid="stAppViewContainer"] {
-    background: radial-gradient(1200px at 10% 10%, #1a1f2b, #0b0d12);
+html, body, [data-testid="stApp"] {
+    background: radial-gradient(1200px at 10% 10%, #1a2233, #0b0f16);
     color: #e6e9ef;
     font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
 }
-[data-testid="stSidebar"] { display: none; }
 
-/* ---------- Card ---------- */
-.auth-card {
-    max-width: 560px;
-    margin: 80px auto;
-    padding: 56px 52px;
-    border-radius: 28px;
-    background:
-      linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0)),
-      radial-gradient(900px at 0% 0%, rgba(90,140,255,0.22), transparent 60%);
-    box-shadow: 0 40px 80px rgba(0,0,0,0.65);
+/* Center wrapper */
+.auth-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 90vh;
 }
 
-/* ---------- Header ---------- */
+/* Glass card */
+.auth-card {
+    width: 460px;
+    padding: 36px 36px 42px 36px;
+    border-radius: 22px;
+    background: linear-gradient(
+        180deg,
+        rgba(40, 56, 88, 0.55),
+        rgba(20, 28, 44, 0.55)
+    );
+    backdrop-filter: blur(18px);
+    border: 1px solid rgba(120, 160, 255, 0.12);
+    box-shadow: 0 30px 80px rgba(0,0,0,0.55);
+}
+
+/* Title */
 .auth-title {
-    font-size: 42px;
+    text-align: center;
+    font-size: 34px;
     font-weight: 700;
-    margin-bottom: 10px;
-    background: linear-gradient(90deg, #5b8cff, #7cf5d3);
+    background: linear-gradient(90deg, #6ea8ff, #7dd3fc);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-}
-.auth-sub {
-    font-size: 15px;
-    color: #aab0c0;
-    margin-bottom: 34px;
+    margin-bottom: 6px;
 }
 
-/* ---------- Segmented control ---------- */
+/* Subtitle */
+.auth-sub {
+    text-align: center;
+    font-size: 14px;
+    color: #9aa4b2;
+    margin-bottom: 26px;
+}
+
+/* Segment control */
 .segment {
     display: flex;
-    gap: 10px;
-    margin-bottom: 32px;
+    gap: 8px;
+    background: rgba(10,15,25,0.6);
+    padding: 6px;
+    border-radius: 14px;
+    margin-bottom: 22px;
 }
+
 .segment button {
     flex: 1;
-    background: rgba(255,255,255,0.06) !important;
-    border-radius: 14px !important;
-    border: 1px solid rgba(255,255,255,0.08) !important;
-    padding: 12px !important;
-    font-weight: 600 !important;
-    color: #c3c8d4 !important;
+    padding: 10px 0;
+    border-radius: 10px;
+    border: none;
+    background: transparent;
+    color: #c7d2fe;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
 }
+
 .segment button.active {
-    background: linear-gradient(90deg, #5b8cff, #7cf5d3) !important;
-    color: #0b0d12 !important;
-    border: none !important;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: white;
+    box-shadow: 0 6px 20px rgba(59,130,246,0.45);
 }
 
-/* ---------- Inputs ---------- */
-input {
-    background: rgba(255,255,255,0.05) !important;
-    border-radius: 14px !important;
-    border: 1px solid rgba(255,255,255,0.08) !important;
-    padding: 14px !important;
-    color: #e6e9ef !important;
-}
-input:focus {
-    border-color: rgba(124,245,211,0.6) !important;
-    box-shadow: 0 0 0 1px rgba(124,245,211,0.25) !important;
+/* Inputs */
+.stTextInput input {
+    background: rgba(15, 22, 36, 0.85);
+    border: 1px solid rgba(120,160,255,0.15);
+    border-radius: 12px;
+    color: #e6e9ef;
+    padding: 12px;
 }
 
-/* ---------- Main button ---------- */
-.main-btn {
-    background: linear-gradient(90deg, #5b8cff, #7cf5d3) !important;
-    border-radius: 14px !important;
-    padding: 14px !important;
-    font-weight: 600 !important;
-    border: none !important;
-    box-shadow: 0 10px 30px rgba(91,140,255,0.35);
+/* Primary button */
+.stButton > button {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    border: none;
+    border-radius: 14px;
+    padding: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    color: white;
+    box-shadow: 0 10px 30px rgba(59,130,246,0.45);
 }
 
-/* ---------- Footer ---------- */
-.auth-foot {
-    margin-top: 26px;
-    font-size: 13px;
-    color: #9aa4b2;
+.stButton > button:hover {
+    transform: translateY(-1px);
+}
+
+/* Footer */
+.auth-footer {
     text-align: center;
+    font-size: 12px;
+    color: #8b95a5;
+    margin-top: 18px;
 }
 </style>
 """, unsafe_allow_html=True)
 
-# ================= CARD START =================
-st.markdown('<div class="auth-card">', unsafe_allow_html=True)
+# ---------------- UI LAYOUT ----------------
+st.markdown('<div class="auth-wrapper"><div class="auth-card">', unsafe_allow_html=True)
 
-# ---------- HEADER INSIDE CARD ----------
 st.markdown('<div class="auth-title">Diabetic Retinopathy PS</div>', unsafe_allow_html=True)
 st.markdown(
-    '<div class="auth-sub">'
-    'AI-powered retinal screening for early diabetic eye disease detection'
-    '</div>',
+    '<div class="auth-sub">AI-powered retinal screening for early diabetic eye disease detection</div>',
     unsafe_allow_html=True
 )
 
-# ---------- Segmented buttons ----------
+# ---------------- SEGMENT SWITCH ----------------
 c1, c2 = st.columns(2)
 
 with c1:
-    if st.button("Login", use_container_width=True):
+    if st.button(
+        "Login",
+        key="seg_login",
+        use_container_width=True
+    ):
         st.session_state.auth_mode = "login"
 
 with c2:
-    if st.button("Create Account", use_container_width=True):
+    if st.button(
+        "Create Account",
+        key="seg_signup",
+        use_container_width=True
+    ):
         st.session_state.auth_mode = "signup"
 
-# ================= FORMS =================
-if st.session_state.auth_mode == "login":
-    email = st.text_input("Email")
-    password = st.text_input("Password", type="password")
+# Apply active styling (CSS hook)
+st.markdown("""
+<script>
+const buttons = window.parent.document.querySelectorAll('button');
+buttons.forEach(b => {
+    if (b.innerText === "Login" && "%s" === "login") b.classList.add("active");
+    if (b.innerText === "Create Account" && "%s" === "signup") b.classList.add("active");
+});
+</script>
+""" % (st.session_state.auth_mode, st.session_state.auth_mode), unsafe_allow_html=True)
 
-    if st.button("Login", use_container_width=True):
-        try:
-            res = login(email, password)
-            if res.user:
+# ---------------- FORM ----------------
+email = st.text_input("Email")
+password = st.text_input("Password", type="password")
+
+# ---------------- ACTION ----------------
+if st.session_state.auth_mode == "login":
+    if st.button("Login", key="login_submit", use_container_width=True):
+        with st.spinner("Signing you in..."):
+            time.sleep(0.6)
+            try:
+                res = login(email, password)
                 st.session_state.authenticated = True
                 st.session_state.user_email = email
                 st.switch_page("app.py")
-        except AuthApiError as e:
-            st.error(str(e))
+            except AuthApiError as e:
+                msg = str(e)
+                if "Email not confirmed" in msg:
+                    st.warning("Please verify your email before logging in.")
+                else:
+                    st.error("Invalid email or password.")
 
 else:
-    new_email = st.text_input("Email", key="signup_email")
-    new_password = st.text_input("Password (min 6 characters)", type="password")
-
-    if st.button("Create Account", use_container_width=True):
-        try:
-            res = signup(new_email, new_password)
-            if res.user:
-                st.success("Account created. Please check your email to verify.")
-        except AuthApiError as e:
-            st.error(str(e))
+    if st.button("Create Account", key="signup_submit", use_container_width=True):
+        with st.spinner("Creating account..."):
+            time.sleep(0.6)
+            try:
+                signup(email, password)
+                st.success("Account created. Check your email to verify.")
+            except AuthApiError as e:
+                st.error(str(e))
 
 st.markdown(
-    '<div class="auth-foot">🔒 Secure • 🩺 Medical-grade • 🤖 AI-assisted</div>',
+    '<div class="auth-footer">🔒 Secure • Medical-grade • AI-assisted</div>',
     unsafe_allow_html=True
 )
 
-# ================= CARD END =================
-st.markdown('</div>', unsafe_allow_html=True)
+st.markdown('</div></div>', unsafe_allow_html=True)
