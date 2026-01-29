@@ -29,12 +29,76 @@ import requests
 
 # ---------- SIDEBAR ----------
 with st.sidebar:
-    st.markdown("### Account")
-    st.write(st.session_state.get("user_email", ""))
-    if st.button("Logout"):
-        logout()
+    st.markdown("""
+    <style>
+    .sidebar-container {
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    .sidebar-top {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
+    .brand {
+        font-size: 20px;
+        font-weight: 700;
+        color: #e6ebff;
+    }
+    .brand-sub {
+        font-size: 12px;
+        color: #9aa6c7;
+        margin-top: -6px;
+    }
+    .section-title {
+        font-size: 12px;
+        color: #7f8bb3;
+        text-transform: uppercase;
+        margin-bottom: 6px;
+    }
+    .account-email {
+        font-size: 13px;
+        color: #8bdcff;
+        word-break: break-all;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+    st.markdown('<div class="sidebar-container">', unsafe_allow_html=True)
+
+    # TOP
+    st.markdown('<div class="sidebar-top">', unsafe_allow_html=True)
+    st.markdown('<div class="brand">Diabetic Retinopathy PS</div>', unsafe_allow_html=True)
+    st.markdown('<div class="brand-sub">Clinical AI Screening</div>', unsafe_allow_html=True)
+
+    st.markdown('<div class="section-title">Navigation</div>', unsafe_allow_html=True)
+    page = st.radio(
+        "",
+        ["Dashboard", "Upload Scan", "Reports", "History", "About DR"],
+        label_visibility="collapsed"
+    )
+
+    st.markdown('<div class="section-title">Actions</div>', unsafe_allow_html=True)
+    st.button("Upload New Scan", use_container_width=True)
+    st.button("Generate Report", use_container_width=True)
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    # BOTTOM
+    st.markdown('<div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">Account</div>', unsafe_allow_html=True)
+    st.markdown(
+        f'<div class="account-email">{st.session_state.get("user_email","")}</div>',
+        unsafe_allow_html=True
+    )
+
+    if st.button("Logout", use_container_width=True):
         st.session_state.authenticated = False
-        st.rerun()
+        st.switch_page("Login.py")
+
+    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
 
 
