@@ -13,7 +13,7 @@ if "authenticated" not in st.session_state:
 
 # ---------------- AUTO REDIRECT ----------------
 if st.session_state.authenticated:
-    st.switch_page("pages/app.py")  # CHANGE PATH IF NEEDED
+    st.switch_page("app.py")  # CHANGE PATH IF NEEDED
     st.stop()
 
 # ---------------- CSS (NO CARD) ----------------
