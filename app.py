@@ -1,53 +1,53 @@
 import streamlit as st
 import torch
 import torch.nn as nn
-from torchvision import models, transforms
-from PIL import Image
+from torchvision import models
 import requests
 import os
+from report_utils import run_pipeline
+
+st.set_page_config(page_title="Diabetic Retinopathy Detection", layout="centered")
 
 @st.cache_resource
-def load_model():
-    model_path = "efficientnet_b3_best.pt"
+def ensure_model_file():
+    model_path = "efficientnet_b3_state_dict.pt"
 
     if not os.path.exists(model_path):
         url = "https://huggingface.co/Pavansetty/DR-Pavan/resolve/main/efficientnet_b3_state_dict.pt"
-        r = requests.get(url)
+        r = requests.get(url, stream=True)
+        r.raise_for_status()
         with open(model_path, "wb") as f:
-            f.write(r.content)
+            for chunk in r.iter_content(chunk_size=8192):
+                if chunk:
+                    f.write(chunk)
 
-    model = models.efficientnet_b3(weights=None)
-    model.classifier[1] = nn.Linear(model.classifier[1].in_features, 5)
+    return model_path
 
-    state_dict = torch.load(
-    model_path,
-    map_location="cpu",
-    weights_only=True
+
+st.title("🩺 Diabetic Retinopathy Detection & Report")
+
+uploaded = st.file_uploader(
+    "Upload Fundus Image",
+    type=["jpg", "jpeg", "png"]
 )
 
-    model.load_state_dict(state_dict)
-    model.eval()
-    return model
-
-model = load_model()
-
-tfms = transforms.Compose([
-    transforms.Resize((380, 380)),
-    transforms.ToTensor()
-])
-
-st.title("Diabetic Retinopathy Detection")
-
-uploaded = st.file_uploader("Upload fundus image", type=["jpg", "png", "jpeg"])
-
 if uploaded:
-    img = Image.open(uploaded).convert("RGB")
-    st.image(img, use_column_width=True)
+    st.image(uploaded, caption="Uploaded Fundus Image", use_column_width=True)
 
-    x = tfms(img).unsqueeze(0)
+    model_path = ensure_model_file()
 
-    with torch.no_grad():
-        out = model(x)
-        pred = out.argmax(dim=1).item()
+    with st.spinner("Analyzing image and generating detailed medical report..."):
+        cls, prob, pdf_bytes = run_pipeline(
+            image_bytes=uploaded.read(),
+            model_path=model_path
+        )
 
-    st.write("Predicted Class:", pred)
+    st.success(f"Predicted DR Stage: {cls}")
+    st.write(f"Confidence: {prob * 100:.2f}%")
+
+    st.download_button(
+        label="⬇️ Download Detailed PDF Medical Report",
+        data=pdf_bytes,
+        file_name="Diabetic_Retinopathy_Report.pdf",
+        mime="application/pdf"
+    )
