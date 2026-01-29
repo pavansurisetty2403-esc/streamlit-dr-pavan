@@ -220,29 +220,6 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-# ================= FLOATING EYE =================
-st.markdown("""
-<div style="display:flex; justify-content:center; margin:40px 0;">
-  <img
-    src="https://raw.githubusercontent.com/feathericons/feather/master/icons/eye.svg"
-    style="
-      width:120px;
-      filter: drop-shadow(0 0 20px rgba(124,245,211,0.35));
-      animation: floatEye 6s ease-in-out infinite;
-    "
-  />
-</div>
-
-<style>
-@keyframes floatEye {
-    0% { transform: translateY(0); }
-    50% { transform: translateY(-14px); }
-    100% { transform: translateY(0); }
-}
-</style>
-""", unsafe_allow_html=True)
-
-
 
 # ================= ABOUT =================
 st.markdown("""
