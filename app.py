@@ -1,6 +1,5 @@
 import streamlit as st
 from PIL import Image
-import tempfile
 import time
 import os
 import requests
@@ -17,6 +16,7 @@ st.set_page_config(
 MODEL_URL = "https://huggingface.co/Pavansetty/DR-Pavan/resolve/main/efficientnet_b3_state_dict.pt"
 MODEL_PATH = "efficientnet_b3_state_dict.pt"
 
+@st.cache_resource
 def ensure_model():
     if not os.path.exists(MODEL_PATH):
         with st.spinner("Downloading AI model (one-time setup)…"):
@@ -40,9 +40,7 @@ html, body {
     to {opacity: 1; transform: translateY(0);}
 }
 
-.fade {
-    animation: fadeIn 0.7s ease forwards;
-}
+.fade { animation: fadeIn 0.7s ease forwards; }
 
 .card {
     background: linear-gradient(145deg, #161a22, #0d0f14);
@@ -52,19 +50,10 @@ html, body {
     box-shadow: 0 14px 35px rgba(0,0,0,0.6);
 }
 
-.center {
-    display: flex;
-    justify-content: center;
-}
+.center { display: flex; justify-content: center; }
 
-.status {
-    font-size: 34px;
-    font-weight: 700;
-}
-
-.conf {
-    color: #9aa4b2;
-}
+.status { font-size: 34px; font-weight: 700; }
+.conf { color: #9aa4b2; }
 
 .success {
     background: linear-gradient(135deg, #143a25, #0f2a1c);
@@ -73,7 +62,7 @@ html, body {
     color: #4ade80;
 }
 
-footer {visibility: hidden;}
+footer { visibility: hidden; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -91,37 +80,31 @@ AI-assisted diabetic retinopathy screening & automated health reporting
 st.markdown("""
 <div class="card fade">
 <h2>About Diabetic Retinopathy</h2>
-
 <p>
-<b>Diabetic Retinopathy (DR)</b> is a diabetes-related eye disease caused by long-term
-damage to the small blood vessels of the retina. It often develops silently and may
-progress to <b>irreversible vision loss</b> if not detected early.
+Diabetic Retinopathy (DR) is a diabetes-related eye disease caused by damage
+to retinal blood vessels. Early detection can prevent irreversible vision loss.
 </p>
 
-<h3>Stages of Diabetic Retinopathy</h3>
+<h3>Stages</h3>
 <ul>
-<li><b>No DR</b> – Healthy retina with no visible abnormalities</li>
-<li><b>Mild</b> – Microaneurysms begin to appear</li>
-<li><b>Moderate</b> – Increased leakage and vessel blockage</li>
-<li><b>Severe</b> – Large retinal ischemia</li>
-<li><b>Proliferative</b> – Abnormal vessel growth (highest risk)</li>
+<li>No DR</li>
+<li>Mild</li>
+<li>Moderate</li>
+<li>Severe</li>
+<li>Proliferative</li>
 </ul>
 
-<h3>What This Website Does</h3>
+<h3>What this system does</h3>
 <ul>
-<li>Enhances and preprocesses fundus images</li>
-<li>Analyzes retinal vascular damage using deep learning</li>
+<li>Preprocesses fundus images</li>
+<li>Uses deep learning to assess retinal damage</li>
 <li>Predicts DR stage with confidence</li>
-<li>Generates a detailed clinical PDF report</li>
+<li>Generates a clinical PDF report</li>
 </ul>
-
-<p style="color:#9aa4b2">
-For screening and educational use only. Not a replacement for professional diagnosis.
-</p>
 </div>
 """, unsafe_allow_html=True)
 
-# ================== UPLOAD SECTION ==================
+# ================== UPLOAD ==================
 st.markdown("""
 <div class="card fade center">
 <h2>Upload Fundus Image</h2>
@@ -134,7 +117,7 @@ uploaded = st.file_uploader(
     label_visibility="collapsed"
 )
 
-# ================== ANALYSIS FLOW ==================
+# ================== ANALYSIS ==================
 if uploaded:
     with st.spinner("Analyzing retinal image…"):
         progress = st.progress(0)
@@ -142,12 +125,10 @@ if uploaded:
             time.sleep(0.01)
             progress.progress(i + 1)
 
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as tmp:
-            Image.open(uploaded).convert("RGB").save(tmp.name)
-            image_path = tmp.name
-
+        image_bytes = uploaded.getvalue()
         model_path = ensure_model()
-        cls, prob, pdf_bytes = run_pipeline(image_path, model_path)
+
+        cls, prob, pdf_bytes = run_pipeline(image_bytes, model_path)
 
     # ================== RESULT ==================
     st.markdown(f"""
@@ -160,7 +141,7 @@ if uploaded:
 
     st.success("Analysis complete")
 
-    # ================== EXPORT PDF ==================
+    # ================== PDF ==================
     st.markdown("<div class='card fade'>", unsafe_allow_html=True)
     st.download_button(
         label="⬇️ Export Health Report (PDF)",
@@ -179,6 +160,6 @@ if uploaded:
 # ================== FOOTER ==================
 st.markdown("""
 <p style="text-align:center; color:#9aa4b2; margin-top:40px">
-Always consult a certified ophthalmologist for medical decisions.
+For screening only. Always consult a certified ophthalmologist.
 </p>
 """, unsafe_allow_html=True)
