@@ -127,42 +127,112 @@ uploaded = st.file_uploader(
 
 # ================== ANALYSIS FLOW ==================
 if uploaded:
+    # show minimal UI feedback while processing
     with st.spinner("Analyzing retinal image…"):
         progress = st.progress(0)
-        for i in range(100):
-            time.sleep(0.01)
+        for i in range(0, 80, 8):
+            time.sleep(0.03)
             progress.progress(i + 1)
 
+        # save uploaded image to temp file for run_pipeline
         with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as tmp:
             Image.open(uploaded).convert("RGB").save(tmp.name)
-            cls, prob, pdf_bytes = run_pipeline(tmp.name)
+            tmp_path = tmp.name
 
-    # ================== RESULT ==================
-    st.markdown(f"""
-    <div class="card fade">
-        <h2>Retinal Status</h2>
-        <div class="status">{cls}</div>
-        <div class="conf">Confidence: {prob*100:.1f}%</div>
-    </div>
-    """, unsafe_allow_html=True)
+        # call run_pipeline robustly and handle different return types
+        cls = None
+        prob = None
+        pdf_bytes = None
+        error_msg = None
 
-    st.success("Analysis complete")
+        try:
+            result = run_pipeline(tmp_path)  # call as before
 
-    # ================== EXPORT PDF ==================
-    st.markdown("<div class='card fade'>", unsafe_allow_html=True)
-    st.download_button(
-        label="⬇️ Export Health Report (PDF)",
-        data=pdf_bytes,
-        file_name="Diabetic_Retinopathy_Report.pdf",
-        mime="application/pdf"
-    )
-    st.markdown("</div>", unsafe_allow_html=True)
+            # normalize result into (cls, prob, pdf_bytes)
+            if result is None:
+                error_msg = "run_pipeline returned None."
+            elif isinstance(result, bytes):
+                # only PDF bytes returned
+                pdf_bytes = result
+            elif isinstance(result, dict):
+                cls = result.get("cls") or result.get("stage") or result.get("label")
+                prob = result.get("prob") or result.get("confidence")
+                pdf_bytes = result.get("pdf_bytes") or result.get("pdf")
+            elif isinstance(result, (list, tuple)):
+                if len(result) == 3:
+                    cls, prob, pdf_bytes = result
+                elif len(result) == 2:
+                    cls, prob = result
+                elif len(result) == 1:
+                    # single element - could be bytes
+                    first = result[0]
+                    if isinstance(first, bytes):
+                        pdf_bytes = first
+                    elif isinstance(first, dict):
+                        pdf_bytes = first.get("pdf_bytes") or first.get("pdf")
+                else:
+                    # unexpected tuple size
+                    error_msg = f"run_pipeline returned tuple of length {len(result)}"
+            else:
+                # unexpected type
+                error_msg = f"run_pipeline returned unsupported type: {type(result)}"
 
-    st.markdown("""
-    <div class="success fade">
-    Report generated successfully. You may download and share it with your healthcare provider.
-    </div>
-    """, unsafe_allow_html=True)
+        except Exception as e:
+            import traceback
+            tb = traceback.format_exc()
+            # show short friendly message and print full trace to app logs
+            st.error("Analysis failed. See logs for details.")
+            st.text_area("Error trace (for debugging)", tb, height=250)
+            # stop further UI for this run
+            raise
+
+        finally:
+            progress.progress(100)
+            time.sleep(0.12)
+
+    # show result (best-effort)
+    if cls is not None or prob is not None:
+        cls_display = cls if cls is not None else "Unknown"
+        prob_display = f"{prob*100:.1f}%" if (prob is not None and isinstance(prob, (float,int))) else "Unknown"
+        st.markdown(f"""
+        <div class="card fade">
+            <h2>Retinal Status</h2>
+            <div class="status">{cls_display}</div>
+            <div class="conf">Confidence: {prob_display}</div>
+        </div>
+        """, unsafe_allow_html=True)
+    elif pdf_bytes and not (cls or prob):
+        # only pdf returned
+        st.markdown("""
+        <div class="card fade">
+            <h2>Analysis Complete</h2>
+            <div class="conf">Report generated (no label returned by run_pipeline).</div>
+        </div>
+        """, unsafe_allow_html=True)
+    else:
+        if error_msg:
+            st.warning(f"Analysis completed but result parsing failed: {error_msg}")
+        else:
+            st.warning("Analysis completed but no usable output returned by run_pipeline.")
+
+    # export PDF (if available)
+    if pdf_bytes:
+        st.markdown("<div class='card fade'>", unsafe_allow_html=True)
+        st.download_button(
+            label="⬇️ Export Health Report (PDF)",
+            data=pdf_bytes,
+            file_name="Diabetic_Retinopathy_Report.pdf",
+            mime="application/pdf"
+        )
+        st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown("""
+        <div class="success fade">
+        Report generated successfully. You may download and share it with your healthcare provider.
+        </div>
+        """, unsafe_allow_html=True)
+    else:
+        st.info("No PDF available to download from the analysis.")
+
 
 # ================== FOOTER ==================
 st.markdown("""
