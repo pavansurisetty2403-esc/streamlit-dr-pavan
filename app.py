@@ -140,6 +140,52 @@ html, body {
 footer { visibility: hidden; }
 </style>
 """, unsafe_allow_html=True)
+# ================= ABOUT SECTION STYLES =================
+st.markdown("""
+<style>
+.about-section {
+    padding: 64px 56px;
+    border-radius: 32px;
+    background: linear-gradient(
+        180deg,
+        rgba(255,255,255,0.05),
+        rgba(255,255,255,0.015)
+    );
+    box-shadow: 0 50px 120px rgba(0,0,0,0.6);
+    margin: 80px auto;
+    max-width: 1100px;
+}
+
+.fade-up {
+    opacity: 0;
+    transform: translateY(24px);
+    animation: fadeUp 0.8s ease forwards;
+}
+
+.fade-up.delay-1 { animation-delay: 0.2s; }
+.fade-up.delay-2 { animation-delay: 0.4s; }
+.fade-up.delay-3 { animation-delay: 0.6s; }
+
+@keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.info-card {
+    margin-top: 28px;
+    padding: 26px 28px;
+    border-radius: 22px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
+.info-title {
+    color: #7cf5d3;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+</style>
+""", unsafe_allow_html=True)
+
 
 # ================= HERO =================
 st.markdown("""
@@ -153,101 +199,52 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ================= ABOUT =================
+# ================= ABOUT =================
 st.markdown("""
-<style>
-.scroll-section {
-    position: relative;
-    padding: 60px 48px;
-    border-radius: 28px;
-    background: linear-gradient(
-        180deg,
-        rgba(255,255,255,0.06),
-        rgba(255,255,255,0.02)
-    );
-    box-shadow: 0 40px 90px rgba(0,0,0,0.65);
-    margin-bottom: 80px;
-}
+<div class="about-section">
 
-.reveal {
-    opacity: 0;
-    transform: translateY(30px);
-    animation: revealUp 0.9s ease forwards;
-}
+  <h2 class="fade-up">About Diabetic Retinopathy</h2>
 
-.reveal.delay-1 { animation-delay: 0.2s; }
-.reveal.delay-2 { animation-delay: 0.4s; }
-.reveal.delay-3 { animation-delay: 0.6s; }
-
-@keyframes revealUp {
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.info-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 28px;
-    margin-top: 36px;
-}
-
-.info-box {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 20px;
-    padding: 24px;
-}
-
-.info-title {
-    color: #7cf5d3;
-    font-weight: 600;
-    margin-bottom: 10px;
-}
-</style>
-
-<div class="scroll-section">
-  <h2 class="reveal">About Diabetic Retinopathy</h2>
-
-  <p class="reveal delay-1" style="max-width:900px; font-size:16px; color:#cfd5e2;">
+  <p class="fade-up delay-1" style="max-width:900px; color:#cfd5e2; font-size:16px;">
     Diabetic Retinopathy (DR) is a progressive eye disease caused by long-term diabetes.
     Persistently high blood sugar damages the tiny blood vessels of the retina —
     the light-sensitive tissue responsible for vision.
   </p>
 
-  <p class="reveal delay-2" style="max-width:900px; font-size:16px; color:#cfd5e2;">
-    In early stages, DR often shows no symptoms. As the disease progresses,
-    vessels may leak fluid, become blocked, or grow abnormally, leading to blurred vision,
-    dark spots, or irreversible blindness if untreated.
+  <p class="fade-up delay-2" style="max-width:900px; color:#cfd5e2; font-size:16px;">
+    In early stages, DR usually has no symptoms. As damage increases, blood vessels may
+    leak fluid, become blocked, or grow abnormally — leading to blurred vision,
+    dark spots, and permanent blindness if untreated.
   </p>
 
-  <div class="info-grid">
-    <div class="info-box reveal delay-1">
-      <div class="info-title">Why it’s dangerous</div>
-      <p style="color:#b8bfcc;">
-        Vision loss from DR is often permanent. By the time symptoms appear,
-        significant retinal damage may already have occurred.
-      </p>
-    </div>
-
-    <div class="info-box reveal delay-2">
-      <div class="info-title">Who is at risk</div>
-      <p style="color:#b8bfcc;">
-        Anyone with diabetes — especially longer than 5–10 years —
-        poor glucose control, high blood pressure, or kidney disease.
-      </p>
-    </div>
-
-    <div class="info-box reveal delay-3">
-      <div class="info-title">Why early screening matters</div>
-      <p style="color:#b8bfcc;">
-        Early detection enables treatment before vision loss begins.
-        Routine screening can reduce blindness risk by more than 90%.
-      </p>
-    </div>
+  <div class="info-card fade-up delay-1">
+    <div class="info-title">Why it’s dangerous</div>
+    <p style="color:#b8bfcc;">
+      Vision loss from DR is often irreversible. When symptoms appear,
+      significant retinal damage has usually already occurred.
+    </p>
   </div>
+
+  <div class="info-card fade-up delay-2">
+    <div class="info-title">Who is at risk</div>
+    <p style="color:#b8bfcc;">
+      Anyone with diabetes — especially for more than 5–10 years —
+      poor glucose control, high blood pressure, kidney disease,
+      or smoking history.
+    </p>
+  </div>
+
+  <div class="info-card fade-up delay-3">
+    <div class="info-title">Why early screening matters</div>
+    <p style="color:#b8bfcc;">
+      Early screening allows treatment before vision loss begins.
+      Regular eye exams can reduce blindness risk by more than 90%.
+    </p>
+  </div>
+
 </div>
 """, unsafe_allow_html=True)
+
 
 # ================= HOW IT WORKS =================
 st.markdown("""
