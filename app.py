@@ -11,21 +11,21 @@ st.set_page_config(
     layout="wide",
 )
 
-# ================= MODEL SETUP =================
+# ================= MODEL =================
 MODEL_URL = "https://huggingface.co/Pavansetty/DR-Pavan/resolve/main/efficientnet_b3_state_dict.pt"
 MODEL_PATH = "efficientnet_b3_state_dict.pt"
 
 @st.cache_resource
 def ensure_model():
     if not os.path.exists(MODEL_PATH):
-        with st.spinner("Downloading AI model (one-time setup)…"):
+        with st.spinner("Downloading AI model (one-time)…"):
             r = requests.get(MODEL_URL)
             r.raise_for_status()
             with open(MODEL_PATH, "wb") as f:
                 f.write(r.content)
     return MODEL_PATH
 
-# ================= STYLES (ChronoTask inspired) =================
+# ================= STYLES =================
 st.markdown("""
 <style>
 html, body {
@@ -77,18 +77,64 @@ html, body {
 
 .conf { color: #9aa4b2; margin-top: 6px; }
 
+/* confidence bar */
+.conf-bar {
+    height: 8px;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.08);
+    overflow: hidden;
+    margin-top: 12px;
+}
+.conf-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #5b8cff, #7cf5d3);
+    width: 0%;
+    animation: fillBar 1.2s ease forwards;
+}
+@keyframes fillBar {
+    to { width: var(--w); }
+}
+
+/* badge pulse */
+.badge {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: rgba(124,245,211,0.15);
+    color: #7cf5d3;
+    animation: pulse 2s infinite;
+}
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(124,245,211,0.4); }
+    70% { box-shadow: 0 0 0 12px rgba(124,245,211,0); }
+    100% { box-shadow: 0 0 0 0 rgba(124,245,211,0); }
+}
+
+/* timeline */
+.timeline {
+    border-left: 2px solid rgba(255,255,255,0.1);
+    padding-left: 20px;
+}
+.timeline-item {
+    margin-bottom: 18px;
+    position: relative;
+}
+.timeline-item::before {
+    content: "";
+    position: absolute;
+    left: -11px;
+    top: 6px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #5b8cff, #7cf5d3);
+}
+
 .success {
     background: linear-gradient(135deg, rgba(90,255,170,0.18), rgba(60,200,150,0.06));
     border-radius: 18px;
     padding: 16px;
     color: #7cf5d3;
-}
-
-button[kind="primary"] {
-    background: linear-gradient(135deg, #5b8cff, #7cf5d3);
-    color: #0b0d12;
-    border-radius: 14px;
-    font-weight: 600;
 }
 
 footer { visibility: hidden; }
@@ -100,45 +146,33 @@ st.markdown("""
 <div class="hero fade">
   <h1>Diabetic Retinopathy <span class="accent">PS</span></h1>
   <p style="max-width:760px; color:#aab0c0; font-size:16px">
-    AI-powered retinal screening platform inspired by modern clinical dashboards.
-    Upload a fundus image to receive an automated diabetic retinopathy assessment
-    and a downloadable clinical report.
+    AI-powered retinal screening that detects diabetic retinopathy early,
+    explains disease severity, and generates clinical reports in seconds.
   </p>
 </div>
 """, unsafe_allow_html=True)
 
-# ================= ABOUT DR =================
+# ================= ABOUT =================
 st.markdown("""
 <div class="card fade">
 <h2>About Diabetic Retinopathy</h2>
-
 <p>
-<b>Diabetic Retinopathy (DR)</b> is a diabetes-related eye disease caused by progressive
-damage to retinal blood vessels. Early stages are often asymptomatic, but advanced
-stages can lead to <b>permanent vision loss</b>.
+Diabetic Retinopathy is a diabetes-related eye disease caused by damage to retinal
+blood vessels. It often progresses silently and may cause permanent vision loss
+if untreated.
 </p>
+</div>
+""", unsafe_allow_html=True)
 
-<h3>Stages</h3>
-<ul>
-<li>No DR – Healthy retina</li>
-<li>Mild – Microaneurysms appear</li>
-<li>Moderate – Vessel blockage and leakage</li>
-<li>Severe – Retinal ischemia</li>
-<li>Proliferative – Abnormal vessel growth (highest risk)</li>
-</ul>
-
-<h3>What This Platform Does</h3>
-<ul>
-<li>Preprocesses and enhances fundus images</li>
-<li>Analyzes retinal vascular damage using deep learning</li>
-<li>Predicts DR stage with confidence</li>
-<li>Generates a detailed patient-friendly PDF report</li>
-</ul>
-
-<p style="color:#9aa4b2">
-This tool is for screening and educational purposes only and does not replace
-professional ophthalmic diagnosis.
-</p>
+# ================= HOW IT WORKS =================
+st.markdown("""
+<div class="card fade">
+<h2>How It Works</h2>
+<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:18px">
+<div><b>1. Upload</b><br><span class="conf">Secure fundus image upload</span></div>
+<div><b>2. Analyze</b><br><span class="conf">Deep learning retinal assessment</span></div>
+<div><b>3. Report</b><br><span class="conf">Stage prediction & PDF</span></div>
+</div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -165,39 +199,51 @@ if uploaded:
 
         image_bytes = uploaded.getvalue()
         model_path = ensure_model()
-
         cls, prob, pdf_bytes = run_pipeline(image_bytes, model_path)
 
     # ================= RESULT =================
     st.markdown(f"""
     <div class="card fade">
       <h3 class="accent">Retinal Status</h3>
+      <span class="badge">{cls}</span>
       <div class="status">{cls}</div>
-      <div class="conf">Confidence: {prob*100:.1f}%</div>
+      <div class="conf-bar">
+        <div class="conf-fill" style="--w:{prob*100:.1f}%"></div>
+      </div>
     </div>
     """, unsafe_allow_html=True)
 
-    st.success("Analysis completed successfully")
+    # ================= STAGES =================
+    st.markdown("""
+    <div class="card fade">
+    <h2>Stages of Diabetic Retinopathy</h2>
+    <div class="timeline">
+      <div class="timeline-item">No DR – Healthy retina</div>
+      <div class="timeline-item">Mild – Microaneurysms</div>
+      <div class="timeline-item">Moderate – Leakage & blockage</div>
+      <div class="timeline-item">Severe – Ischemia</div>
+      <div class="timeline-item">Proliferative – Abnormal vessels</div>
+    </div>
+    </div>
+    """, unsafe_allow_html=True)
 
-    # ================= PDF EXPORT =================
-    st.markdown("<div class='card fade'>", unsafe_allow_html=True)
+    # ================= PDF =================
     st.download_button(
-        label="⬇️ Download Clinical Report (PDF)",
-        data=pdf_bytes,
+        "⬇️ Download Clinical Report (PDF)",
+        pdf_bytes,
         file_name="Diabetic_Retinopathy_Report.pdf",
         mime="application/pdf"
     )
-    st.markdown("</div>", unsafe_allow_html=True)
 
     st.markdown("""
     <div class="success fade">
-    Report generated. You may download and share it with a healthcare professional.
+    ✅ Report generated successfully and ready for download
     </div>
     """, unsafe_allow_html=True)
 
 # ================= FOOTER =================
 st.markdown("""
 <p style="text-align:center; color:#9aa4b2; margin-top:40px">
-Always consult a certified ophthalmologist for medical decisions.
+Always consult a certified ophthalmologist.
 </p>
 """, unsafe_allow_html=True)
