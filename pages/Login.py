@@ -5,98 +5,152 @@ from supabase_auth.errors import AuthApiError
 # ================= PAGE CONFIG =================
 st.set_page_config(
     page_title="Diabetic Retinopathy PS | Login",
-    layout="centered"
+    layout="centered",
 )
 
-# ================= SESSION INIT =================
+# ================= SESSION =================
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
+
+if "auth_mode" not in st.session_state:
+    st.session_state.auth_mode = "login"
 
 # ================= STYLES =================
 st.markdown("""
 <style>
-body {
-    background: radial-gradient(circle at top, #121826, #0b0f14);
-    color: #e6edf3;
+
+/* ---------- Global ---------- */
+html, body, [data-testid="stAppViewContainer"] {
+    background: radial-gradient(1200px at 10% 10%, #1a1f2b, #0b0d12);
+    color: #e6e9ef;
+    font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
+}
+[data-testid="stSidebar"] { display: none; }
+
+/* ---------- Card ---------- */
+.auth-card {
+    max-width: 520px;
+    margin: 90px auto 0 auto;
+    padding: 56px 48px;
+    border-radius: 28px;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0)),
+      radial-gradient(800px at 0% 0%, rgba(90,140,255,0.22), transparent 60%);
+    box-shadow: 0 40px 80px rgba(0,0,0,0.6);
 }
 
-/* Card */
-.login-card {
-    background: #121826;
-    border-radius: 14px;
-    padding: 2.5rem;
-    border: 1px solid rgba(47,129,247,0.25);
-    box-shadow: 0 0 30px rgba(47,129,247,0.15);
-}
-
-/* Titles */
-.app-title {
-    font-size: 2.1rem;
+/* ---------- Title ---------- */
+.auth-title {
+    font-size: 42px;
     font-weight: 700;
-    text-align: center;
-    color: #e6edf3;
+    margin-bottom: 10px;
+    background: linear-gradient(90deg, #5b8cff, #7cf5d3);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
-.app-subtitle {
-    text-align: center;
-    font-size: 0.95rem;
-    color: #9aa4b2;
-    margin-bottom: 1.8rem;
-}
-
-/* Tabs */
-[data-baseweb="tab"] {
-    font-weight: 600;
-    color: #9aa4b2;
-}
-[data-baseweb="tab"][aria-selected="true"] {
-    color: #2f81f7;
-    border-bottom: 2px solid #2f81f7;
+.auth-sub {
+    font-size: 15px;
+    color: #aab0c0;
+    margin-bottom: 36px;
 }
 
-/* Inputs */
-input {
-    background-color: #0b0f14 !important;
-    color: #e6edf3 !important;
-    border: 1px solid rgba(47,129,247,0.25) !important;
+/* ---------- Segmented control ---------- */
+.segment {
+    display: flex;
+    background: rgba(255,255,255,0.05);
+    border-radius: 999px;
+    padding: 6px;
+    margin-bottom: 32px;
 }
-
-/* Buttons */
-button {
-    background: linear-gradient(135deg, #2f81f7, #1f6feb) !important;
-    color: white !important;
-    border-radius: 8px !important;
+.segment button {
+    flex: 1;
+    background: transparent !important;
+    border-radius: 999px !important;
+    border: none !important;
+    padding: 12px !important;
     font-weight: 600 !important;
+    color: #9aa4b2 !important;
+    box-shadow: none !important;
+}
+.segment button.active {
+    background: linear-gradient(90deg, #5b8cff, #7cf5d3) !important;
+    color: #0b0d12 !important;
 }
 
-/* Footer text */
-.trust {
-    text-align: center;
-    font-size: 0.85rem;
-    color: #9aa4b2;
-    margin-top: 1.2rem;
+/* ---------- Inputs ---------- */
+input {
+    background: rgba(255,255,255,0.05) !important;
+    border-radius: 14px !important;
+    border: 1px solid rgba(255,255,255,0.08) !important;
+    padding: 14px !important;
+    color: #e6e9ef !important;
 }
+input:focus {
+    border-color: rgba(124,245,211,0.6) !important;
+    box-shadow: 0 0 0 1px rgba(124,245,211,0.25) !important;
+}
+
+/* ---------- Main button ---------- */
+.main-btn {
+    background: linear-gradient(90deg, #5b8cff, #7cf5d3) !important;
+    border-radius: 999px !important;
+    padding: 14px !important;
+    font-weight: 600 !important;
+    border: none !important;
+    box-shadow: 0 10px 30px rgba(91,140,255,0.35);
+}
+
+/* ---------- Footer ---------- */
+.auth-foot {
+    margin-top: 22px;
+    font-size: 13px;
+    color: #9aa4b2;
+    text-align: center;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
 # ================= UI =================
-st.markdown('<div class="login-card">', unsafe_allow_html=True)
+st.markdown('<div class="auth-card">', unsafe_allow_html=True)
 
-st.markdown('<div class="app-title">Diabetic Retinopathy PS</div>', unsafe_allow_html=True)
+st.markdown('<div class="auth-title">Diabetic Retinopathy PS</div>', unsafe_allow_html=True)
 st.markdown(
-    '<div class="app-subtitle">'
-    'AI-powered retinal screening system for early diabetic eye disease detection'
+    '<div class="auth-sub">'
+    'AI-powered retinal screening for early diabetic eye disease detection'
     '</div>',
     unsafe_allow_html=True
 )
 
-tab_login, tab_signup = st.tabs(["Login", "Create Account"])
+# ---------- Segmented buttons ----------
+c1, c2 = st.columns(2)
 
-# ================= LOGIN =================
-with tab_login:
+with c1:
+    if st.button("Login", use_container_width=True):
+        st.session_state.auth_mode = "login"
+
+with c2:
+    if st.button("Create Account", use_container_width=True):
+        st.session_state.auth_mode = "signup"
+
+# Inject active state
+st.markdown(f"""
+<script>
+const buttons = window.parent.document.querySelectorAll("button");
+buttons.forEach(btn => {{
+  if (btn.innerText === "{'Login' if st.session_state.auth_mode=='login' else 'Create Account'}") {{
+    btn.classList.add("active");
+  }}
+}});
+</script>
+""", unsafe_allow_html=True)
+
+# ================= FORMS =================
+if st.session_state.auth_mode == "login":
     email = st.text_input("Email")
     password = st.text_input("Password", type="password")
 
-    if st.button("Login", use_container_width=True):
+    if st.button("Login", use_container_width=True, key="login_btn"):
         try:
             res = login(email, password)
             if res.user:
@@ -112,22 +166,21 @@ with tab_login:
             else:
                 st.error("Login failed.")
 
-# ================= SIGNUP =================
-with tab_signup:
+else:
     new_email = st.text_input("Email", key="signup_email")
     new_password = st.text_input("Password (min 6 characters)", type="password")
 
-    if st.button("Create Account", use_container_width=True):
+    if st.button("Create Account", use_container_width=True, key="signup_btn"):
         try:
             res = signup(new_email, new_password)
             if res.user:
-                st.success("Account created successfully.")
-                st.info("Please check your email to confirm your account before logging in.")
+                st.success("Account created.")
+                st.info("Check your email to confirm before logging in.")
         except AuthApiError as e:
             st.error(str(e))
 
 st.markdown(
-    '<div class="trust">🔒 Secure • 🩺 Medical-grade • 🤖 AI-assisted</div>',
+    '<div class="auth-foot">🔒 Secure • 🩺 Medical-grade • 🤖 AI-assisted</div>',
     unsafe_allow_html=True
 )
 
