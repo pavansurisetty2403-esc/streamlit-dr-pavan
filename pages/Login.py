@@ -18,8 +18,6 @@ if "auth_mode" not in st.session_state:
 # ================= STYLES =================
 st.markdown("""
 <style>
-
-/* ---------- Global ---------- */
 html, body, [data-testid="stAppViewContainer"] {
     background: radial-gradient(1200px at 10% 10%, #1a1f2b, #0b0d12);
     color: #e6e9ef;
@@ -29,17 +27,17 @@ html, body, [data-testid="stAppViewContainer"] {
 
 /* ---------- Card ---------- */
 .auth-card {
-    max-width: 520px;
-    margin: 90px auto 0 auto;
-    padding: 56px 48px;
+    max-width: 560px;
+    margin: 80px auto;
+    padding: 56px 52px;
     border-radius: 28px;
     background:
       linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0)),
-      radial-gradient(800px at 0% 0%, rgba(90,140,255,0.22), transparent 60%);
-    box-shadow: 0 40px 80px rgba(0,0,0,0.6);
+      radial-gradient(900px at 0% 0%, rgba(90,140,255,0.22), transparent 60%);
+    box-shadow: 0 40px 80px rgba(0,0,0,0.65);
 }
 
-/* ---------- Title ---------- */
+/* ---------- Header ---------- */
 .auth-title {
     font-size: 42px;
     font-weight: 700;
@@ -51,30 +49,28 @@ html, body, [data-testid="stAppViewContainer"] {
 .auth-sub {
     font-size: 15px;
     color: #aab0c0;
-    margin-bottom: 36px;
+    margin-bottom: 34px;
 }
 
 /* ---------- Segmented control ---------- */
 .segment {
     display: flex;
-    background: rgba(255,255,255,0.05);
-    border-radius: 999px;
-    padding: 6px;
+    gap: 10px;
     margin-bottom: 32px;
 }
 .segment button {
     flex: 1;
-    background: transparent !important;
-    border-radius: 999px !important;
-    border: none !important;
+    background: rgba(255,255,255,0.06) !important;
+    border-radius: 14px !important;
+    border: 1px solid rgba(255,255,255,0.08) !important;
     padding: 12px !important;
     font-weight: 600 !important;
-    color: #9aa4b2 !important;
-    box-shadow: none !important;
+    color: #c3c8d4 !important;
 }
 .segment button.active {
     background: linear-gradient(90deg, #5b8cff, #7cf5d3) !important;
     color: #0b0d12 !important;
+    border: none !important;
 }
 
 /* ---------- Inputs ---------- */
@@ -93,7 +89,7 @@ input:focus {
 /* ---------- Main button ---------- */
 .main-btn {
     background: linear-gradient(90deg, #5b8cff, #7cf5d3) !important;
-    border-radius: 999px !important;
+    border-radius: 14px !important;
     padding: 14px !important;
     font-weight: 600 !important;
     border: none !important;
@@ -102,18 +98,18 @@ input:focus {
 
 /* ---------- Footer ---------- */
 .auth-foot {
-    margin-top: 22px;
+    margin-top: 26px;
     font-size: 13px;
     color: #9aa4b2;
     text-align: center;
 }
-
 </style>
 """, unsafe_allow_html=True)
 
-# ================= UI =================
+# ================= CARD START =================
 st.markdown('<div class="auth-card">', unsafe_allow_html=True)
 
+# ---------- HEADER INSIDE CARD ----------
 st.markdown('<div class="auth-title">Diabetic Retinopathy PS</div>', unsafe_allow_html=True)
 st.markdown(
     '<div class="auth-sub">'
@@ -133,24 +129,12 @@ with c2:
     if st.button("Create Account", use_container_width=True):
         st.session_state.auth_mode = "signup"
 
-# Inject active state
-st.markdown(f"""
-<script>
-const buttons = window.parent.document.querySelectorAll("button");
-buttons.forEach(btn => {{
-  if (btn.innerText === "{'Login' if st.session_state.auth_mode=='login' else 'Create Account'}") {{
-    btn.classList.add("active");
-  }}
-}});
-</script>
-""", unsafe_allow_html=True)
-
 # ================= FORMS =================
 if st.session_state.auth_mode == "login":
     email = st.text_input("Email")
     password = st.text_input("Password", type="password")
 
-    if st.button("Login", use_container_width=True, key="login_btn"):
+    if st.button("Login", use_container_width=True):
         try:
             res = login(email, password)
             if res.user:
@@ -158,24 +142,17 @@ if st.session_state.auth_mode == "login":
                 st.session_state.user_email = email
                 st.switch_page("app.py")
         except AuthApiError as e:
-            msg = str(e)
-            if "Email not confirmed" in msg:
-                st.warning("Please verify your email before logging in.")
-            elif "Invalid login credentials" in msg:
-                st.error("Incorrect email or password.")
-            else:
-                st.error("Login failed.")
+            st.error(str(e))
 
 else:
     new_email = st.text_input("Email", key="signup_email")
     new_password = st.text_input("Password (min 6 characters)", type="password")
 
-    if st.button("Create Account", use_container_width=True, key="signup_btn"):
+    if st.button("Create Account", use_container_width=True):
         try:
             res = signup(new_email, new_password)
             if res.user:
-                st.success("Account created.")
-                st.info("Check your email to confirm before logging in.")
+                st.success("Account created. Please check your email to verify.")
         except AuthApiError as e:
             st.error(str(e))
 
@@ -184,4 +161,5 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+# ================= CARD END =================
 st.markdown('</div>', unsafe_allow_html=True)
