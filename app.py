@@ -60,6 +60,24 @@ html, body {
     margin-bottom: 30px;
     box-shadow: 0 30px 60px rgba(0,0,0,0.45);
 }
+/* Apple-style hover glow */
+.card,
+.info-card {
+    transition:
+        transform 0.45s cubic-bezier(.2,.8,.2,1),
+        box-shadow 0.45s cubic-bezier(.2,.8,.2,1),
+        border-color 0.45s ease;
+}
+
+.card:hover,
+.info-card:hover {
+    transform: translateY(-6px);
+    box-shadow:
+        0 35px 80px rgba(0,0,0,0.55),
+        0 0 0 1px rgba(124,245,211,0.12),
+        0 0 28px rgba(91,140,255,0.18);
+    border-color: rgba(124,245,211,0.25);
+}
 
 .accent {
     background: linear-gradient(90deg, #5b8cff, #7cf5d3);
@@ -140,6 +158,61 @@ html, body {
 footer { visibility: hidden; }
 </style>
 """, unsafe_allow_html=True)
+st.markdown("""
+<style>
+.section-title {
+    font-size: 40px;
+    font-weight: 700;
+    margin-bottom: 18px;
+    background: linear-gradient(90deg, #5b8cff, #7cf5d3);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.sub-title {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    background: linear-gradient(90deg, #5b8cff, #7cf5d3);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+</style>
+""", unsafe_allow_html=True)
+
+/* Section snap + reveal + hover lift (FINAL) */
+.snap-section {
+    scroll-margin-top: 80px;
+    border-radius: 32px;
+
+    /* entry animation */
+    opacity: 0;
+    transform: translateY(60px) scale(0.96);
+    animation: snapIn 0.9s cubic-bezier(.2,.8,.2,1) both;
+
+    /* hover behavior */
+    transition:
+        transform 0.6s cubic-bezier(.2,.8,.2,1),
+        box-shadow 0.6s cubic-bezier(.2,.8,.2,1);
+}
+
+.snap-section:hover {
+    transform: translateY(-4px) scale(1);
+    box-shadow:
+        0 0 0 1px rgba(124,245,211,0.12),
+        0 60px 140px rgba(0,0,0,0.6);
+}
+
+@keyframes snapIn {
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+
+
+
 # ================= ABOUT SECTION STYLES =================
 st.markdown("""
 <style>
@@ -199,11 +272,10 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ================= ABOUT =================
-# ================= ABOUT =================
 st.markdown("""
-<div class="about-section">
+<div class="about-section snap-section">
 
-  <h2 class="fade-up">About Diabetic Retinopathy</h2>
+  <h2 class="section-title fade-up">About Diabetic Retinopathy</h2>
 
   <p class="fade-up delay-1" style="max-width:900px; color:#cfd5e2; font-size:16px;">
     Diabetic Retinopathy (DR) is a progressive eye disease caused by long-term diabetes.
@@ -218,7 +290,7 @@ st.markdown("""
   </p>
 
   <div class="info-card fade-up delay-1">
-    <div class="info-title">Why it’s dangerous</div>
+    <div class="info-title sub-title">Why it’s dangerous</div>
     <p style="color:#b8bfcc;">
       Vision loss from DR is often irreversible. When symptoms appear,
       significant retinal damage has usually already occurred.
@@ -226,7 +298,7 @@ st.markdown("""
   </div>
 
   <div class="info-card fade-up delay-2">
-    <div class="info-title">Who is at risk</div>
+    <div class="info-title sub-title">Who is at risk</div>
     <p style="color:#b8bfcc;">
       Anyone with diabetes — especially for more than 5–10 years —
       poor glucose control, high blood pressure, kidney disease,
@@ -235,7 +307,7 @@ st.markdown("""
   </div>
 
   <div class="info-card fade-up delay-3">
-    <div class="info-title">Why early screening matters</div>
+    <div class="info-title sub-title">Why early screening matters</div>
     <p style="color:#b8bfcc;">
       Early screening allows treatment before vision loss begins.
       Regular eye exams can reduce blindness risk by more than 90%.
@@ -249,7 +321,7 @@ st.markdown("""
 # ================= HOW IT WORKS =================
 st.markdown("""
 <div class="card fade">
-<h2>How It Works</h2>
+<h2 class="section-title fade-up">How It Works</h2>
 <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:18px">
 <div><b>1. Upload</b><br><span class="conf">Secure fundus image upload</span></div>
 <div><b>2. Analyze</b><br><span class="conf">Deep learning retinal assessment</span></div>
@@ -261,7 +333,7 @@ st.markdown("""
 # ================= UPLOAD =================
 st.markdown("""
 <div class="card fade center">
-  <h2 class="accent">Upload Fundus Image</h2>
+  <h2 class="section-title fade-up center">Upload Fundus Image</h2>
 </div>
 """, unsafe_allow_html=True)
 
