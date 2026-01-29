@@ -57,6 +57,8 @@ html, body {
     padding: 14px;
     color: #4ade80;
 }
+
+footer {visibility: hidden;}
 </style>
 """, unsafe_allow_html=True)
 
@@ -65,7 +67,7 @@ st.markdown("""
 <div class="card fade">
 <h1>🩺 Diabetic Retinopathy PS</h1>
 <p style="color:#9aa4b2">
-AI-assisted retinal screening, disease staging & automated health reporting
+AI-assisted diabetic retinopathy screening & automated health reporting
 </p>
 </div>
 """, unsafe_allow_html=True)
@@ -76,24 +78,24 @@ st.markdown("""
 <h2>About Diabetic Retinopathy</h2>
 
 <p>
-<b>Diabetic Retinopathy (DR)</b> is a diabetes-related eye disease caused by long-term damage
-to the tiny blood vessels of the retina. It often progresses silently and can lead to
-<b>irreversible vision loss or blindness</b> if not detected early.
+<b>Diabetic Retinopathy (DR)</b> is a diabetes-related eye disease caused by damage
+to the small blood vessels of the retina. It often develops silently in early
+stages and may progress to <b>irreversible vision loss</b> if not detected early.
 </p>
 
 <h3>Stages of Diabetic Retinopathy</h3>
 <ul>
-<li><b>No DR</b> – Healthy retina, no visible damage</li>
-<li><b>Mild</b> – Small microaneurysms appear</li>
-<li><b>Moderate</b> – Increased vessel blockage and leakage</li>
-<li><b>Severe</b> – Large retinal ischemia (oxygen deprivation)</li>
-<li><b>Proliferative</b> – Abnormal blood vessel growth (high risk of vision loss)</li>
+<li><b>No DR</b> – Healthy retina with no visible abnormalities</li>
+<li><b>Mild</b> – Microaneurysms begin to appear</li>
+<li><b>Moderate</b> – Increased leakage and vessel blockage</li>
+<li><b>Severe</b> – Large areas of retinal ischemia</li>
+<li><b>Proliferative</b> – Abnormal vessel growth (high risk stage)</li>
 </ul>
 
 <h3>What This Website Does</h3>
 <p>
-This platform uses a <b>deep learning model trained on retinal fundus images</b> to assist
-in early screening of diabetic retinopathy.
+This platform uses a <b>deep learning model trained on retinal fundus images</b>
+to assist in early screening of diabetic retinopathy.
 </p>
 
 <ul>
@@ -104,8 +106,8 @@ in early screening of diabetic retinopathy.
 </ul>
 
 <p style="color:#9aa4b2">
-This tool is intended for screening and educational use only and does not replace
-professional ophthalmic diagnosis.
+For screening and educational use only. This tool does not replace professional
+ophthalmic diagnosis.
 </p>
 </div>
 """, unsafe_allow_html=True)
@@ -123,13 +125,8 @@ uploaded = st.file_uploader(
     label_visibility="collapsed"
 )
 
-# ================== ANALYSIS ==================
+# ================== ANALYSIS FLOW ==================
 if uploaded:
-    st.markdown("<div class='card fade'>", unsafe_allow_html=True)
-    image = Image.open(uploaded).convert("RGB")
-    st.image(image, caption="Uploaded Fundus Image", use_column_width=True)
-    st.markdown("</div>", unsafe_allow_html=True)
-
     with st.spinner("Analyzing retinal image…"):
         progress = st.progress(0)
         for i in range(100):
@@ -137,7 +134,7 @@ if uploaded:
             progress.progress(i + 1)
 
         with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as tmp:
-            image.save(tmp.name)
+            Image.open(uploaded).convert("RGB").save(tmp.name)
             cls, prob, pdf_bytes = run_pipeline(tmp.name)
 
     # ================== RESULT ==================
@@ -151,7 +148,7 @@ if uploaded:
 
     st.success("Analysis complete")
 
-    # ================== EXPORT ==================
+    # ================== EXPORT PDF ==================
     st.markdown("<div class='card fade'>", unsafe_allow_html=True)
     st.download_button(
         label="⬇️ Export Health Report (PDF)",
@@ -170,6 +167,6 @@ if uploaded:
 # ================== FOOTER ==================
 st.markdown("""
 <p style="text-align:center; color:#9aa4b2; margin-top:40px">
-For screening and educational use only. Always consult a certified ophthalmologist.
+Always consult a certified ophthalmologist for medical decisions.
 </p>
 """, unsafe_allow_html=True)
