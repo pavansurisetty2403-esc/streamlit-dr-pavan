@@ -36,56 +36,58 @@ with st.sidebar:
         display: flex;
         flex-direction: column;
         justify-content: space-between;
+        padding-top: 8px;
     }
     .sidebar-top {
         display: flex;
         flex-direction: column;
-        gap: 24px;
+        gap: 14px;
     }
     .brand {
-        font-size: 20px;
+        font-size: 18px;
         font-weight: 700;
         color: #e6ebff;
+        margin-bottom: 2px;
     }
     .brand-sub {
         font-size: 12px;
         color: #9aa6c7;
-        margin-top: -6px;
+        margin-bottom: 12px;
     }
     .section-title {
         font-size: 12px;
         color: #7f8bb3;
         text-transform: uppercase;
-        margin-bottom: 6px;
+        margin-bottom: 4px;
     }
     .account-email {
-        font-size: 13px;
+        font-size: 12px;
         color: #8bdcff;
         word-break: break-all;
+        margin-bottom: 8px;
     }
     </style>
     """, unsafe_allow_html=True)
 
     st.markdown('<div class="sidebar-container">', unsafe_allow_html=True)
 
-    # TOP
+    # ---------- TOP ----------
     st.markdown('<div class="sidebar-top">', unsafe_allow_html=True)
+
     st.markdown('<div class="brand">Diabetic Retinopathy PS</div>', unsafe_allow_html=True)
     st.markdown('<div class="brand-sub">Clinical AI Screening</div>', unsafe_allow_html=True)
 
     st.markdown('<div class="section-title">Navigation</div>', unsafe_allow_html=True)
+
     page = st.radio(
         "",
-        ["Dashboard", "Upload Scan", "Reports", "History", "About DR"],
+        ["About DR", "Dashboard", "Reports", "History"],
         label_visibility="collapsed"
     )
 
-    st.markdown('<div class="section-title">Actions</div>', unsafe_allow_html=True)
-    st.button("Upload New Scan", use_container_width=True)
-    st.button("Generate Report", use_container_width=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
-    # BOTTOM
+    # ---------- BOTTOM ----------
     st.markdown('<div>', unsafe_allow_html=True)
     st.markdown('<div class="section-title">Account</div>', unsafe_allow_html=True)
     st.markdown(
@@ -99,6 +101,7 @@ with st.sidebar:
 
     st.markdown('</div>', unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
