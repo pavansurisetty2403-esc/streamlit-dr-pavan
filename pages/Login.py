@@ -11,6 +11,11 @@ st.set_page_config(
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 
+# ---------------- AUTO REDIRECT ----------------
+if st.session_state.authenticated:
+    st.switch_page("pages/app.py")  # CHANGE PATH IF NEEDED
+    st.stop()
+
 # ---------------- CSS (NO CARD) ----------------
 st.markdown("""
 <style>
@@ -18,7 +23,6 @@ html, body {
     background: radial-gradient(1200px at 10% 10%, #1a2235, #0b0f1a);
 }
 
-/* Remove all Streamlit default blocks */
 section.main > div:first-child {
     background: none !important;
     box-shadow: none !important;
@@ -26,7 +30,6 @@ section.main > div:first-child {
     padding: 0 !important;
 }
 
-/* Title */
 .app-title {
     text-align: center;
     font-size: 40px;
@@ -38,7 +41,6 @@ section.main > div:first-child {
     margin-bottom: 6px;
 }
 
-/* Subtitle */
 .app-subtitle {
     text-align: center;
     color: #a8b3cf;
@@ -46,7 +48,6 @@ section.main > div:first-child {
     margin-bottom: 28px;
 }
 
-/* Tabs */
 div[data-baseweb="tab-list"] {
     justify-content: center;
     gap: 12px;
@@ -70,7 +71,6 @@ button[aria-selected="true"] {
     border-radius: 10px;
 }
 
-/* Inputs */
 input {
     background: rgba(15,25,45,0.75) !important;
     border: 1px solid rgba(120,160,255,0.18) !important;
@@ -79,7 +79,6 @@ input {
     color: #e6ebff !important;
 }
 
-/* Buttons */
 .stButton > button {
     background: linear-gradient(90deg,#3b82f6,#60a5fa);
     color: white;
