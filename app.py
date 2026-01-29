@@ -32,16 +32,10 @@ with st.sidebar:
     st.markdown("""
     <style>
     .sidebar-container {
-        height: 100vh;
         display: flex;
         flex-direction: column;
-        justify-content: space-between;
+        gap: 12px;
         padding-top: 8px;
-    }
-    .sidebar-top {
-        display: flex;
-        flex-direction: column;
-        gap: 14px;
     }
     .brand {
         font-size: 18px;
@@ -52,43 +46,38 @@ with st.sidebar:
     .brand-sub {
         font-size: 12px;
         color: #9aa6c7;
-        margin-bottom: 12px;
+        margin-bottom: 10px;
     }
     .section-title {
         font-size: 12px;
         color: #7f8bb3;
         text-transform: uppercase;
-        margin-bottom: 4px;
+        margin: 10px 0 4px 0;
     }
     .account-email {
         font-size: 12px;
         color: #8bdcff;
         word-break: break-all;
-        margin-bottom: 8px;
+        margin-bottom: 6px;
     }
     </style>
     """, unsafe_allow_html=True)
 
     st.markdown('<div class="sidebar-container">', unsafe_allow_html=True)
 
-    # ---------- TOP ----------
-    st.markdown('<div class="sidebar-top">', unsafe_allow_html=True)
-
+    # BRAND
     st.markdown('<div class="brand">Diabetic Retinopathy PS</div>', unsafe_allow_html=True)
     st.markdown('<div class="brand-sub">Clinical AI Screening</div>', unsafe_allow_html=True)
 
+    # NAVIGATION (ORDER AS REQUESTED)
     st.markdown('<div class="section-title">Navigation</div>', unsafe_allow_html=True)
-
     page = st.radio(
         "",
         ["About DR", "Dashboard", "Reports", "History"],
         label_visibility="collapsed"
     )
 
-    st.markdown('</div>', unsafe_allow_html=True)
-
-    # ---------- BOTTOM ----------
-    st.markdown('<div>', unsafe_allow_html=True)
+    # ACCOUNT (IMMEDIATELY AFTER NAV)
     st.markdown('<div class="section-title">Account</div>', unsafe_allow_html=True)
     st.markdown(
         f'<div class="account-email">{st.session_state.get("user_email","")}</div>',
@@ -99,7 +88,6 @@ with st.sidebar:
         st.session_state.authenticated = False
         st.switch_page("Login.py")
 
-    st.markdown('</div>', unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
 
