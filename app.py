@@ -36,11 +36,52 @@ html, body {
 }
 
 /* ---------- Animations ---------- */
+/* ===== Ambient background motion ===== */
+@keyframes ambientGlow {
+    0% { background-position: 0% 0%; }
+    50% { background-position: 100% 100%; }
+    100% { background-position: 0% 0%; }
+}
+
+.ambient {
+    background-size: 200% 200%;
+    animation: ambientGlow 18s ease-in-out infinite;
+}
+
 @keyframes fadeUp {
     from { opacity: 0; transform: translateY(18px) scale(0.98); }
     to { opacity: 1; transform: translateY(0) scale(1); }
 }
 .fade { animation: fadeUp 0.7s cubic-bezier(.2,.8,.2,1) forwards; }
+
+
+/* ===== Animated steps ===== */
+.step {
+    padding: 18px;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.04);
+    animation: stepPulse 3.5s ease-in-out infinite;
+}
+
+.step:nth-child(2) { animation-delay: 0.6s; }
+.step:nth-child(3) { animation-delay: 1.2s; }
+
+@keyframes stepPulse {
+    0%, 100% { box-shadow: 0 0 0 rgba(0,0,0,0); }
+    50% { box-shadow: 0 0 24px rgba(124,245,211,0.25); }
+}
+
+/* ===== Download pulse ===== */
+.download-pulse {
+    animation: downloadPulse 1.6s ease-in-out;
+}
+
+@keyframes downloadPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.04); }
+    100% { transform: scale(1); }
+}
+
 
 /* ---------- Hero ---------- */
 .hero {
@@ -178,9 +219,34 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+
+# ================= FLOATING EYE =================
+st.markdown("""
+<div style="display:flex; justify-content:center; margin:40px 0;">
+  <img
+    src="https://raw.githubusercontent.com/feathericons/feather/master/icons/eye.svg"
+    style="
+      width:120px;
+      filter: drop-shadow(0 0 20px rgba(124,245,211,0.35));
+      animation: floatEye 6s ease-in-out infinite;
+    "
+  />
+</div>
+
+<style>
+@keyframes floatEye {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-14px); }
+    100% { transform: translateY(0); }
+}
+</style>
+""", unsafe_allow_html=True)
+
+
+
 # ================= ABOUT =================
 st.markdown("""
-<div class="about-section snap-section">
+<div class="about-section snap-section ambient">
 
   <h2 class="section-title fade-up">About Diabetic Retinopathy</h2>
 
@@ -226,19 +292,19 @@ st.markdown("""
 
 # ================= HOW IT WORKS =================
 st.markdown("""
-<div class="card fade snap-section">
+<div class="card fade snap-section ambient">
   <h2 class="section-title fade-up">How It Works</h2>
   <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:18px">
-    <div class="info-card"><b>1. Upload</b><br><span class="conf">Secure fundus image upload</span></div>
-    <div class="info-card"><b>2. Analyze</b><br><span class="conf">Deep learning retinal assessment</span></div>
-    <div class="info-card"><b>3. Report</b><br><span class="conf">Stage prediction & PDF</span></div>
+    <div class="step"><b>1. Upload</b><br><span class="conf">Secure fundus image upload</span></div>
+    <div class="step"><b>2. Analyze</b><br><span class="conf">Deep learning retinal assessment</span></div>
+    <div class="step"><b>3. Report</b><br><span class="conf">Stage prediction & PDF</span></div>
   </div>
 </div>
 """, unsafe_allow_html=True)
 
 # ================= UPLOAD =================
 st.markdown("""
-<div class="card fade center snap-section">
+<div class="card fade center snap-section ambient">
   <h2 class="section-title fade-up center">Upload Fundus Image</h2>
 </div>
 """, unsafe_allow_html=True)
@@ -251,7 +317,7 @@ uploaded = st.file_uploader(
 
 # ================= ANALYSIS =================
 if uploaded:
-    with st.spinner("Running retinal analysis…"):
+    with st.spinner("Analyzing retinal microvasculature…"):
         progress = st.progress(0)
         for i in range(100):
             time.sleep(0.008)
@@ -296,7 +362,7 @@ if uploaded:
     )
 
     st.markdown("""
-    <div class="success fade">
+    <div class="success fade download-pulse">
     ✅ Report generated successfully and ready for download
     </div>
     """, unsafe_allow_html=True)
