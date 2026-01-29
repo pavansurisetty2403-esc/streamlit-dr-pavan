@@ -552,7 +552,7 @@ def generate_pdf(original_path, processed_path, cls, prob, pdf_path):
 
 def run_pipeline(image_bytes, model_path):
     print("Loading model...")
-    model, class_names = load_model()
+    model, class_names = load_model(model_path)
 
     print("Reading image...")
     file_bytes = np.asarray(bytearray(image_bytes), dtype=np.uint8)
@@ -581,6 +581,3 @@ def run_pipeline(image_bytes, model_path):
     pdf_bytes = generate_pdf(orig_save, proc_save, cls, prob, None)
     return cls, prob, pdf_bytes
 
-
-run_pipeline("/Users/pavansurisetty/Desktop/fcc32dffd24d.png",
-             "final_fundus_report1000.pdf")
