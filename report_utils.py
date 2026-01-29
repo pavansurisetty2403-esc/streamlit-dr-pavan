@@ -24,18 +24,22 @@ MODEL_PATH = None
 # =======================================
 
 def load_model(model_path):
-    checkpoint = torch.load(model_path, map_location="cpu")
+    state_dict = torch.load(model_path, map_location="cpu")
 
     model = models.efficientnet_b3(weights=None)
     model.classifier[1] = torch.nn.Linear(model.classifier[1].in_features, 5)
 
-    model.load_state_dict(checkpoint["model_state"])
-    model.to(DEVICE)
+    model.load_state_dict(state_dict)
     model.eval()
 
-    class_names = checkpoint["class_names"]
-    print("Loaded model with classes:", class_names)
-    print("Best validation accuracy:", checkpoint["best_val_accuracy"])
+    # class names are fixed for your problem
+    class_names = [
+        "No DR",
+        "Mild",
+        "Moderate",
+        "Severe",
+        "Proliferative DR"
+    ]
 
     return model, class_names
 
