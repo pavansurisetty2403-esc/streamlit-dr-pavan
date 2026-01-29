@@ -3,4 +3,6 @@ torch
 torchvision
 numpy
 Pillow
+reportlab
 requests
+opencv-python-headless
