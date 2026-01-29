@@ -7,59 +7,43 @@ st.set_page_config(
     layout="centered"
 )
 
-# ---------------- SESSION INIT ----------------
+# ---------------- SESSION ----------------
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 
-# ---------------- CSS ----------------
+# ---------------- CSS (NO CARD) ----------------
 st.markdown("""
 <style>
 html, body {
     background: radial-gradient(1200px at 10% 10%, #1a2235, #0b0f1a);
 }
 
-/* Kill Streamlit default container */
+/* Remove all Streamlit default blocks */
 section.main > div:first-child {
-    background: transparent !important;
+    background: none !important;
     box-shadow: none !important;
     border: none !important;
     padding: 0 !important;
 }
 
-/* Login card */
-.login-wrapper {
-    max-width: 720px;
-    margin: 10vh auto;
-    padding: 60px 56px 48px 56px; /* Increased top padding to 60px for better centering */
-    border-radius: 28px;
-    background: linear-gradient(
-        145deg,
-        rgba(40,60,110,0.35),
-        rgba(10,15,25,0.55)
-    );
-    backdrop-filter: blur(18px);
-    box-shadow:
-        inset 0 0 0 1px rgba(120,160,255,0.12),
-        0 30px 80px rgba(0,0,0,0.6);
-}
-
 /* Title */
-.login-title {
+.app-title {
     text-align: center;
-    font-size: 38px;
+    font-size: 40px;
     font-weight: 700;
     background: linear-gradient(90deg,#6ea8ff,#8bdcff);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    margin-top: 12vh;
     margin-bottom: 6px;
 }
 
 /* Subtitle */
-.login-subtitle {
+.app-subtitle {
     text-align: center;
     color: #a8b3cf;
     font-size: 14px;
-    margin-bottom: 32px; /* Increased margin to separate from tabs */
+    margin-bottom: 28px;
 }
 
 /* Tabs */
@@ -69,10 +53,8 @@ div[data-baseweb="tab-list"] {
     background: rgba(255,255,255,0.04);
     border-radius: 14px;
     padding: 6px;
-    margin-bottom: 24px;
     max-width: 360px;
-    margin-left: auto;
-    margin-right: auto;
+    margin: 0 auto 28px auto;
 }
 
 button[data-baseweb="tab"] {
@@ -111,14 +93,9 @@ input {
 """, unsafe_allow_html=True)
 
 # ---------------- UI ----------------
-
-# Opening the wrapper div
-st.markdown('<div class="login-wrapper">', unsafe_allow_html=True)
-
-# Title and Subtitle are now explicitly placed inside the wrapper
-st.markdown('<div class="login-title">Diabetic Retinopathy PS</div>', unsafe_allow_html=True)
+st.markdown('<div class="app-title">Diabetic Retinopathy PS</div>', unsafe_allow_html=True)
 st.markdown(
-    '<div class="login-subtitle">AI-powered retinal screening for early diabetic eye disease detection</div>',
+    '<div class="app-subtitle">AI-powered retinal screening for early diabetic eye disease detection</div>',
     unsafe_allow_html=True
 )
 
@@ -153,6 +130,3 @@ with tab_signup:
             st.success("Account created. Verify email before login.")
         elif isinstance(res, AuthApiError):
             st.error("Signup failed")
-
-# Closing the wrapper div
-st.markdown('</div>', unsafe_allow_html=True)
