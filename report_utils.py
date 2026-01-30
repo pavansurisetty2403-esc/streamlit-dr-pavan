@@ -12,8 +12,7 @@ from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import inch
 
-DEVICE = "cuda" if torch.cuda.is_available() else \
-         "mps" if torch.backends.mps.is_available() else "cpu"
+DEVICE = torch.device("cpu")
 print("Using device:", DEVICE)
 
 # --- MODEL CHECKPOINT ---
@@ -30,7 +29,9 @@ def load_model(model_path):
     model.classifier[1] = torch.nn.Linear(model.classifier[1].in_features, 5)
 
     model.load_state_dict(state_dict)
+    model = model.to(DEVICE)
     model.eval()
+
 
     # class names are fixed for your problem
     class_names = [
@@ -122,7 +123,7 @@ def to_tensor_image(img):
 
 def predict(model, tensor, class_names):
     with torch.no_grad():
-        out = model(tensor)
+        out = model(tensor.to(DEVICE))
         prob = torch.softmax(out, dim=1)
         cls = torch.argmax(prob).item()
         return cls, prob[0][cls].item()

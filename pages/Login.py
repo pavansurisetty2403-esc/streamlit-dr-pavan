@@ -4,23 +4,35 @@ from supabase_auth.errors import AuthApiError
 
 st.set_page_config(
     page_title="Diabetic Retinopathy PS | Login",
-    layout="centered"
+    layout="centered",
+    initial_sidebar_state="collapsed"
 )
 
 # ---------------- SESSION ----------------
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 
-# ---------------- AUTO REDIRECT ----------------
+# ---------------- REDIRECT AFTER LOGIN ----------------
+# IMPORTANT: redirect DIRECTLY to About_DR page
 if st.session_state.authenticated:
-    st.switch_page("app.py")  # CHANGE PATH IF NEEDED
+    st.switch_page("pages/About_DR.py")
     st.stop()
 
-# ---------------- CSS (NO CARD) ----------------
+# ---------------- FORCE HIDE SIDEBAR ----------------
+st.markdown("""
+<style>
+[data-testid="stSidebar"] { display: none !important; }
+[data-testid="stSidebarNav"] { display: none !important; }
+</style>
+""", unsafe_allow_html=True)
+
+# ---------------- THEME ----------------
 st.markdown("""
 <style>
 html, body {
-    background: radial-gradient(1200px at 10% 10%, #1a2235, #0b0f1a);
+    background: radial-gradient(1200px at 10% 10%, #1a1f2b, #0b0d12);
+    color: #e6e9ef;
+    font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
 }
 
 section.main > div:first-child {
@@ -34,7 +46,7 @@ section.main > div:first-child {
     text-align: center;
     font-size: 40px;
     font-weight: 700;
-    background: linear-gradient(90deg,#6ea8ff,#8bdcff);
+    background: linear-gradient(90deg,#5b8cff,#7cf5d3);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     margin-top: 12vh;
@@ -43,8 +55,8 @@ section.main > div:first-child {
 
 .app-subtitle {
     text-align: center;
-    color: #a8b3cf;
-    font-size: 14px;
+    color: #aab0c0;
+    font-size: 15px;
     margin-bottom: 28px;
 }
 
@@ -106,8 +118,7 @@ with tab_login:
     password = st.text_input("Password", type="password")
 
     if st.button("Login", use_container_width=True):
-        with st.spinner("Authenticating"):
-            res = login(email, password)
+        res = login(email, password)
 
         if hasattr(res, "user") and res.user:
             st.session_state.authenticated = True
@@ -122,10 +133,9 @@ with tab_signup:
     new_password = st.text_input("Password (min 6 chars)", type="password")
 
     if st.button("Create Account", use_container_width=True):
-        with st.spinner("Creating account"):
-            res = signup(new_email, new_password)
+        res = signup(new_email, new_password)
 
         if hasattr(res, "user") and res.user:
-            st.success("Account created. Verify email before login.")
+            st.success("Account created. Verify your email before login.")
         elif isinstance(res, AuthApiError):
             st.error("Signup failed")
